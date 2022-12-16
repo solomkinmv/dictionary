@@ -58,6 +58,6 @@ jobs:
 
       - name: Build client and copy to backend resources
         run: |
-          cd react-client
+          cd dictionary-client
           npm install
           npm run build
