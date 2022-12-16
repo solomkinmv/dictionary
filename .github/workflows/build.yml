@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '19'
-          distribution: 'coretto'
+          distribution: 'corretto'
           cache: gradle
 
       - uses: actions/setup-node@v3
