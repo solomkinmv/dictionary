@@ -32,7 +32,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '19'
-          distribution: 'adopt'
+          distribution: 'corretto'
           cache: gradle
 
       - name: Build with Gradle
