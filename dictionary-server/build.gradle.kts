@@ -5,6 +5,8 @@ plugins {
     id("org.graalvm.buildtools.native") version "0.9.18"
 }
 
+apply plugin: "jacoco"
+
 group = "in.solomk"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_HIGHER
@@ -41,6 +43,18 @@ dependencyManagement {
     }
 }
 
+jacocoTestReport {
+    dependsOn test
+            reports {
+                xml.enabled true
+                csv.enabled true
+            }
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+test {
+    finalizedBy jacocoTestReport
 }
