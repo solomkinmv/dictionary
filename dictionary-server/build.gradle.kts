@@ -1,15 +1,14 @@
 plugins {
     java
+    jacoco
     id("org.springframework.boot") version "3.0.0"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.graalvm.buildtools.native") version "0.9.18"
 }
 
-apply plugin: "jacoco"
-
 group = "in.solomk"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_HIGHER
+java.sourceCompatibility = JavaVersion.VERSION_19
 
 configurations {
     compileOnly {
@@ -20,8 +19,6 @@ configurations {
 repositories {
     mavenCentral()
 }
-
-extra["testcontainersVersion"] = "1.17.6"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -43,18 +40,14 @@ dependencyManagement {
     }
 }
 
-jacocoTestReport {
-    dependsOn test
-            reports {
-                xml.enabled true
-                csv.enabled true
-            }
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test) // tests are required to run before generating the report
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-test {
-    finalizedBy jacocoTestReport
 }
