@@ -9,7 +9,7 @@ plugins {
 
 group = "in.solomk"
 project.version = scmVersion.version
-java.sourceCompatibility = JavaVersion.VERSION_19
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 configurations {
     compileOnly {
