@@ -47,6 +47,11 @@ jobs:
           rm -rf ../dictionary-server/src/main/resources/public/static/
           \cp -r ./build/* ../dictionary-server/src/main/resources/public/
 
+      - name: Increment version
+        run: |
+          cd dictionary-server
+          ./gradlew release
+
       - name: Build Docker image
         run: |
           cd dictionary-server
@@ -60,16 +65,6 @@ jobs:
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
-
-      - name: get next version
-        id: 'bump'
-        uses: allegro-actions/next-version@v1
-
-      - name: Push new tag on master
-        uses: allegro-actions/create-tag@v1
-        with:
-          tag: ${{ steps.bump.outputs.next_tag }}
-          current-tag: ${{ steps.bump.outputs.current_tag }}
 
       - name: Upload test coverage to Codecov
         uses: codecov/codecov-action@v3.1.1
