@@ -44,6 +44,10 @@ jobs:
 #      - name: Build docker container and push
 #        run: |
 #          ./mvnw -B package docker:build docker:push
+      - name: Configure Git user
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
 
       - name: get next version
         id: 'bump'
