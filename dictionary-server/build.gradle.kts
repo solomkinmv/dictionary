@@ -4,7 +4,13 @@ plugins {
     id("org.springframework.boot") version "3.0.0"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.graalvm.buildtools.native") version "0.9.18"
-    id("pl.allegro.tech.build.axion-release") version "1.14.0"
+    id("pl.allegro.tech.build.axion-release") version "1.14.3"
+}
+
+scmVersion {
+    repository {
+        directory.set(project.rootProject.file("../"))
+    }
 }
 
 group = "in.solomk"
@@ -19,12 +25,6 @@ configurations {
 
 repositories {
     mavenCentral()
-}
-
-scmVersion {
-    repository {
-        directory.set(project.rootProject.file("../"))
-    }
 }
 
 dependencies {
