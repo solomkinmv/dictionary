@@ -73,12 +73,18 @@ jobs:
         run: |
           docker push solomkinmv/dictionary:latest
 
-      - name: Configure Git user
-        run: |
-          git config user.email "actions@github.com"
-          git config user.name "GitHub Actions"
+#      - name: Configure Git user
+#        run: |
+#          git config user.email "actions@github.com"
+#          git config user.name "GitHub Actions"
 
       - name: Upload test coverage to Codecov
         uses: codecov/codecov-action@v3.1.1
         with:
           file: ./dictionary-server/build/jacoco/test.exec
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - run: |
+          cd dictionary-server
+          flyctl deploy --remote-only
