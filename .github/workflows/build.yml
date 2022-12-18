@@ -13,11 +13,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Get tags
-        run: |
-          git fetch --tags origin
-          git tag -l
+        with:
+          fetch-depth: 0
 
 #      - name: Set up QEMU
 #        uses: docker/setup-qemu-action@v2
