@@ -16,6 +16,7 @@ jobs:
 
       - name: Get tags
         run: |
+          git fetch --tags origin
           git tag -l
 
 #      - name: Set up QEMU
