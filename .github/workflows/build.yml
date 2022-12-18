@@ -16,7 +16,6 @@ jobs:
         with:
           fetch-depth: 0
 
-
 #      - name: Set up QEMU
 #        uses: docker/setup-qemu-action@v2
 #
@@ -56,7 +55,6 @@ jobs:
       - name: Increment version
         run: |
           cd dictionary-server
-          git fetch --tags --unshallow
           ./gradlew currentVersion
           ./gradlew release
 
