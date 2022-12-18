@@ -39,18 +39,27 @@ jobs:
           cache: 'npm'
           cache-dependency-path: dictionary-client/package-lock.json
 
-      - name: Build client and copy to backend resources
+      - name: Build client
         run: |
           cd dictionary-client
           npm install
           npm run build
-          rm -rf ../dictionary-server/src/main/resources/public/static/
-          \cp -r ./build/* ../dictionary-server/src/main/resources/public/
+
+      - name: Build server
+        run: |
+          cd dictionary-server
+          ./gradlew build
 
       - name: Increment version
         run: |
           cd dictionary-server
           ./gradlew release
+
+      - name: Copy client to backend resources
+        run: |
+          cd dictionary-client
+          rm -rf ../dictionary-server/src/main/resources/public/static/
+          \cp -r ./build/* ../dictionary-server/src/main/resources/public/
 
       - name: Build Docker image
         run: |
@@ -70,10 +79,3 @@ jobs:
         uses: codecov/codecov-action@v3.1.1
         with:
           file: ./dictionary-server/build/jacoco/test.exec
-
-#  deploy:
-#    needs: build
-#
-#    uses: ./.github/workflows/deploy.yml
-#    secrets: inherit
-
