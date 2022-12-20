@@ -2,5 +2,4 @@
 
 ## Required properties
 
-* spring.data.mongodb.host
-* spring.data.mongodb.port
+* spring.data.mongodb.uri

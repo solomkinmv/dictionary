@@ -1,0 +1,11 @@
+### Get user words
+GET {{dictionary-server-host}}/api/users/1/words
+
+### Add user word
+POST {{dictionary-server-host}}/api/users/1/words
+Content-Type: application/json
+
+{
+  "word": "test",
+  "translation": "тест"
+}
