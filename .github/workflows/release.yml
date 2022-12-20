@@ -1,4 +1,4 @@
-name: Build && Deploy
+name: Release new version
 
 on:
   workflow_call:

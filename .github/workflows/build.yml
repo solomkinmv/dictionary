@@ -46,6 +46,7 @@ jobs:
         with:
           file: ./dictionary-server/build/jacoco/test.exec
 
-      - name: Release new version
-        if: "!contains(github.event.head_commit.message, '[skip release]')"
-        uses: ./.github/workflows/release.yml
+  release:
+    needs: build
+    if: "!contains(github.event.head_commit.message, '[skip release]')"
+    uses: ./.github/workflows/deploy.yml
