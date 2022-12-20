@@ -6,8 +6,7 @@ on:
       - main
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-env:
-  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -50,3 +49,4 @@ jobs:
     needs: build
     if: "!contains(github.event.head_commit.message, '[skip release]')"
     uses: ./.github/workflows/release.yml
+    secrets: inherit
