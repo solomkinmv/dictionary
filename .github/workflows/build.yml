@@ -6,7 +6,8 @@ on:
       - main
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -45,8 +46,51 @@ jobs:
         with:
           file: ./dictionary-server/build/jacoco/test.exec
 
-  release:
-    needs: build
-    if: "!contains(github.event.head_commit.message, '[skip release]')"
-    uses: ./.github/workflows/release.yml
-    secrets: inherit
+      - name: Set up QEMU
+        if: "!contains(github.event.head_commit.message, '[skip release]')"
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        if: "!contains(github.event.head_commit.message, '[skip release]')"
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        if: "!contains(github.event.head_commit.message, '[skip release]')"
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Copy client to backend resources
+        if: "!contains(github.event.head_commit.message, '[skip release]')"
+        run: |
+          cd dictionary-client
+          rm -rf ../dictionary-server/src/main/resources/public/static/
+          \cp -r ./build/* ../dictionary-server/src/main/resources/public/
+
+      - name: Build Docker image
+        if: "!contains(github.event.head_commit.message, '[skip release]')"
+        run: |
+          cd dictionary-server
+          ./gradlew bootBuildImage --imageName=solomkinmv/dictionary:latest
+
+      - name: Push Docker image
+        if: "!contains(github.event.head_commit.message, '[skip release]')"
+        run: |
+          docker push solomkinmv/dictionary:latest
+
+      - name: Increment version
+        if: "!contains(github.event.head_commit.message, '[skip release]')"
+        run: |
+          cd dictionary-server
+          ./gradlew currentVersion
+          ./gradlew release -Prelease.disableUncommittedCheck
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+        if: "!contains(github.event.head_commit.message, '[skip release]')"
+
+      - name: Trigger deploy
+        if: "!contains(github.event.head_commit.message, '[skip release]')"
+        run: |
+          cd dictionary-server
+          flyctl deploy --remote-only
