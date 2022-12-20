@@ -48,4 +48,4 @@ jobs:
 
       - name: Release new version
         if: "!contains(github.event.head_commit.message, '[skip release]')"
-        uses: ./.github/workflows/release.yml
+        uses: solomkinmv/dictionary/.github/workflows/release.yml
