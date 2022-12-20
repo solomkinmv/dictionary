@@ -7,12 +7,9 @@ import in.solomk.dictionary.service.model.UnsavedWord;
 import in.solomk.dictionary.service.model.UserWords;
 import in.solomk.dictionary.service.model.Word;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserWordsWebApiMapper {
-
-    UserWordsWebApiMapper INSTANCE = Mappers.getMapper(UserWordsWebApiMapper.class);
 
     UserWordsResponse toUserWordsResponse(UserWords userWordsDocument);
 
