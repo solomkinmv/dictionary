@@ -1,0 +1,4 @@
+GET {{dictionary-server-host}}/actuator/health
+
+
+

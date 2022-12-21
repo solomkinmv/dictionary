@@ -5,6 +5,7 @@ import in.solomk.dictionary.api.dto.WordResponse;
 import in.solomk.dictionary.api.mapper.UserWordsWebApiMapper;
 import in.solomk.dictionary.service.UsersWordsService;
 import lombok.AllArgsConstructor;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -21,6 +22,7 @@ public class AddWordHandler implements HandlerFunction<ServerResponse> {
     private final UserWordsWebApiMapper mapper;
 
     @Override
+    @RegisterReflectionForBinding(value = WordResponse.class)
     public Mono<ServerResponse> handle(ServerRequest request) {
         String userId = request.pathVariable("userId");
         return ServerResponse.ok()

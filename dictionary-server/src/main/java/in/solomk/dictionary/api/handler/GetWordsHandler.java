@@ -1,8 +1,10 @@
 package in.solomk.dictionary.api.handler;
 
+import in.solomk.dictionary.api.dto.UserWordsResponse;
 import in.solomk.dictionary.api.mapper.UserWordsWebApiMapper;
 import in.solomk.dictionary.service.UsersWordsService;
 import lombok.AllArgsConstructor;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFunction;
@@ -18,6 +20,7 @@ public class GetWordsHandler implements HandlerFunction<ServerResponse> {
     private final UserWordsWebApiMapper mapper;
 
     @Override
+    @RegisterReflectionForBinding(value = UserWordsResponse.class)
     public Mono<ServerResponse> handle(ServerRequest request) {
         return usersWordsService.getUserWords(request.pathVariable("userId"))
                                 .map(mapper::toUserWordsResponse)
