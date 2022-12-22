@@ -2,6 +2,7 @@ package in.solomk.dictionary.api;
 
 import in.solomk.dictionary.api.handler.AddWordHandler;
 import in.solomk.dictionary.api.handler.GetWordsHandler;
+import in.solomk.dictionary.api.handler.ProfileHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -18,11 +19,13 @@ public class RouteConfiguration {
 
     @Bean
     RouterFunction<ServerResponse> routerFunction(GetWordsHandler getWordsHandler,
-                                                  AddWordHandler addWordHandler) {
+                                                  AddWordHandler addWordHandler,
+                                                  ProfileHandler profileHandler) {
         HandlerFunction<ServerResponse> indexPage = (req) -> ServerResponse.ok().bodyValue(new ClassPathResource("public/index.html"));
         return RouterFunctions.route()
                               .GET("/api/users/{userId}/words", getWordsHandler)
                               .POST("/api/users/{userId}/words", addWordHandler)
+                              .GET("/me", profileHandler)
                               .resources("/**", new ClassPathResource("/public/"))
                               .GET("/**", indexPage)
                               .build();
