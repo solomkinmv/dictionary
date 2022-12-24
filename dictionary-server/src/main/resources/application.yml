@@ -6,3 +6,17 @@ spring:
           google:
             client-id: ${GOOGLE_OAUTH2_CLIENT_ID}
             client-secret: ${GOOGLE_OAUTH2_CLIENT_SECRET}
+          facebook:
+            client-id: ${FACEBOOK_OAUTH2_CLIENT_ID}
+            client-secret: ${FACEBOOK_OAUTH2_CLIENT_SECRET}
+          okta:
+            client-id: ${OKTA_OAUTH2_CLIENT_ID}
+            client-secret: ${OKTA_OAUTH2_CLIENT_SECRET}
+        #            authorization-grant-type: authorization_code
+        provider:
+          okta:
+            authorization-uri: https://dev-lb3wo7gfyk5334wl.us.auth0.com/authorize
+            token-uri: https://dev-lb3wo7gfyk5334wl.us.auth0.com/oauth/token
+            jwk-set-uri: https://dev-lb3wo7gfyk5334wl.us.auth0.com/.well-known/jwks.json
+
+debug: true
