@@ -18,5 +18,7 @@ spring:
             token-uri: ${OKTA_OAUTH2_DOMAIN}.auth0.com/oauth/token
             jwk-set-uri: ${OKTA_OAUTH2_DOMAIN}.auth0.com/.well-known/jwks.json
 
+rsa.private-key: certs/private.pem
+rsa.public-key: certs/public.pem
 
 debug: true
