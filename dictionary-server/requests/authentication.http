@@ -1,0 +1,13 @@
+### Authorization by token, part 1. Retrieve and save token.
+POST {{dictionary-server-host}}/api/token
+Authorization: Basic max password
+
+> {%
+    client.global.set("auth_token", response.body);
+%}
+
+### Authorization by token, part 2. Use token to authorize.
+GET {{dictionary-server-host}}/api/users/1/words
+Authorization: Bearer {{auth_token}}
+
+###
