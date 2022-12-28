@@ -1,15 +1,19 @@
 package in.solomk.dictionary.config;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import in.solomk.dictionary.api.security.TokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -22,6 +26,11 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
+import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
+import reactor.core.publisher.Mono;
+
+import java.util.Map;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -34,12 +43,15 @@ public class SecurityConfiguration {
     @Bean
     public SecurityWebFilterChain filterChain(ServerHttpSecurity http,
 //                                              ReactiveAuthenticationManager jwtAuthenticationManager,
-                                              ReactiveAuthenticationManager userAuthenticationManager) {
+                                              ReactiveAuthenticationManager userAuthenticationManager,
+                                              ServerAuthenticationSuccessHandler jwtServerAuthenticationSuccessHandler) {
         // @formatter:off
         return http.csrf()
                 .disable()
-//                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange()
+//                    .pathMatchers("/").permitAll()
+//                    .pathMatchers("/logout").permitAll()
                     .anyExchange()
                     .authenticated()
                     .and()
@@ -49,16 +61,32 @@ public class SecurityConfiguration {
                         .and()
                     .and()
 //                    .and()
-//                .oauth2Login()
-//                    .and()
-                .httpBasic()
-                    .authenticationManager(userAuthenticationManager)
+                .oauth2Login()
+                    .authenticationSuccessHandler(jwtServerAuthenticationSuccessHandler)
                     .and()
 //                .logout()
 //                    .logoutHandler(logoutHandler)
 //                    .and()
                 .build();
         // @formatter:on
+    }
+
+    @Bean
+    public ServerAuthenticationSuccessHandler jwtServerAuthenticationSuccessHandler(TokenService tokenService,
+                                                                                    ObjectMapper objectMapper) {
+        return (webFilterExchange, authentication) -> {
+            ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
+            String jsonResponse;
+            try {
+                String jwt = tokenService.generateToken(authentication);
+                jsonResponse = objectMapper.writeValueAsString(Map.of("jwt", jwt));
+            } catch (JsonProcessingException e) {
+                return Mono.error(e);
+            }
+            response.getHeaders().add("Content-Type", "application/json");
+            return response.writeWith(Mono.just(response.bufferFactory()
+                                                        .wrap(jsonResponse.getBytes())));
+        };
     }
 
     @Bean
