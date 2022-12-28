@@ -1,3 +1,6 @@
+### Check root endpoint
+GET {{dictionary-server-host}}/
+
 ### Get user words
 GET {{dictionary-server-host}}/api/users/1/words
 
