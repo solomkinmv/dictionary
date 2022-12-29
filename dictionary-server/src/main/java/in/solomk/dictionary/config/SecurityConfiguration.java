@@ -15,16 +15,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtReactiveAuthenticationManager;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
@@ -89,23 +86,23 @@ public class SecurityConfiguration {
         };
     }
 
-    @Bean
-    public MapReactiveUserDetailsService mapReactiveUserDetailsService() {
-        return new MapReactiveUserDetailsService(User.withUsername("max")
-                                                     .password("{noop}password")
-                                                     .authorities("read")
-                                                     .build());
-    }
-
-    @Bean
-    public ReactiveAuthenticationManager userAuthenticationManager(ReactiveUserDetailsService userDetailsService) {
-        return new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
-    }
-
 //    @Bean
-//    public ReactiveAuthenticationManager jwtAuthenticationManager(ReactiveJwtDecoder jwtDecoder) {
-//        return new JwtReactiveAuthenticationManager(jwtDecoder);
+//    public MapReactiveUserDetailsService mapReactiveUserDetailsService() {
+//        return new MapReactiveUserDetailsService(User.withUsername("max")
+//                                                     .password("{noop}password")
+//                                                     .authorities("read")
+//                                                     .build());
 //    }
+//
+//    @Bean
+//    public ReactiveAuthenticationManager userAuthenticationManager(ReactiveUserDetailsService userDetailsService) {
+//        return new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
+//    }
+
+    @Bean
+    public ReactiveAuthenticationManager jwtAuthenticationManager(ReactiveJwtDecoder jwtDecoder) {
+        return new JwtReactiveAuthenticationManager(jwtDecoder);
+    }
 
     @Bean
     public ReactiveJwtDecoder reactiveJwtDecoder() {
