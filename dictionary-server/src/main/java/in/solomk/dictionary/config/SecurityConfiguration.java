@@ -10,9 +10,11 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import in.solomk.dictionary.api.security.TokenService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -29,12 +31,14 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.Map;
 
 @Configuration
 @EnableWebFluxSecurity
 @EnableConfigurationProperties(RsaKeyProperties.class)
 @AllArgsConstructor
+@Slf4j
 public class SecurityConfiguration {
 
     private final RsaKeyProperties rsaKeyProperties;
@@ -93,15 +97,20 @@ public class SecurityConfiguration {
         return (webFilterExchange, authentication) -> {
             ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
             String jsonResponse;
+            String jwt = tokenService.generateToken(authentication);
+            log.debug("Generated JWT: {}", jwt);
             try {
-                String jwt = tokenService.generateToken(authentication);
                 jsonResponse = objectMapper.writeValueAsString(Map.of("jwt", jwt));
             } catch (JsonProcessingException e) {
                 return Mono.error(e);
             }
-            response.getHeaders().add("Content-Type", "application/json");
-            return response.writeWith(Mono.just(response.bufferFactory()
-                                                        .wrap(jsonResponse.getBytes())));
+            return Mono.fromRunnable(() -> {
+                response.setStatusCode(HttpStatus.FOUND);
+                response.getHeaders().setLocation(URI.create("http://localhost:3000/authorized?jwt=" + jwt));
+            });
+//            response.getHeaders().add("Content-Type", "application/json");
+//            return response.writeWith(Mono.just(response.bufferFactory()
+//                                                        .wrap(jsonResponse.getBytes())));
         };
     }
 
