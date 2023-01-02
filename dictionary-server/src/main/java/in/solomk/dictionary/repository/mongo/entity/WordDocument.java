@@ -10,7 +10,7 @@ public record WordDocument(
 ) {
 
     public static WordDocument valueOf(Word word) {
-        return new WordDocument(word.id(), word.word(), word.meaning(), word.translation());
+        return new WordDocument(word.id(), word.wordText(), word.meaning(), word.translation());
     }
 
     public Word toModel() {

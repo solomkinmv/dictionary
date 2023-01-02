@@ -1,24 +1,27 @@
 import {Word} from "../../client/model/word";
+import {dictionaryClient} from "../../client/dictionary-client";
+import {useEffect, useState} from "react";
+import AddWordComponent from "./AddWordComponent";
 
 function WordsComponent() {
-    const words: Word[] = [
-        {
-            id: "1",
-            text: "hello",
-            translation: "привіт",
-        },
-        {
-            id: "2",
-            text: "world",
-            translation: "світ",
-        }
-    ]
+
+    const client = dictionaryClient();
+
+    const [words, setWords] = useState<Word[]>([]);
+
+    useEffect(() => {
+        client.getWords()
+            .then(userWords => {
+                setWords(Array.from(Object.values(userWords.words)));
+            });
+    }, [])
+
     return (
         <div>
+            <AddWordComponent onWordAdded={word => setWords([...words, word])}/>
+            <h1>Words</h1>
             {words.map((word) => (
-                <div key={word.id}>
-                    <p>{word.text} - {word.translation}</p>
-                </div>
+                <li key={word.id}>{word.wordText} - {word.translation}</li>
             ))}
         </div>
     );
