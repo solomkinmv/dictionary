@@ -6,6 +6,8 @@ import App from "./components/app/App";
 import reportWebVitals from "./reportWebVitals";
 import Home from "./components/home/Home";
 import WordsComponent from "./components/words/WordsComponent";
+import Login from "./components/login/LoginComponent";
+import AuthorizationComponent from "./components/authorization/AuthorizationComponent";
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
@@ -14,7 +16,9 @@ root.render(
             <Routes>
                 <Route path="/" element={<App/>}>
                     <Route path="/" element={<Home/>}/>
+                    <Route path="/login" element={<Login/>}/>
                     <Route path="/words" element={<WordsComponent/>}/>
+                    <Route path="/authorized/:provider" element={<AuthorizationComponent/>}/>
                     <Route
                         path="*"
                         element={

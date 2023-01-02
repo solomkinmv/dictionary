@@ -25,6 +25,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtRea
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsWebFilter;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -43,8 +45,14 @@ public class SecurityConfiguration {
                                               ReactiveAuthenticationManager userAuthenticationManager,
                                               ServerAuthenticationSuccessHandler jwtServerAuthenticationSuccessHandler) {
         // @formatter:off
-        return http.csrf()
-                .disable()
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+//            return config;
+        return http
+                .csrf().disable()
+                .cors(corsSpec -> corsSpec.configurationSource(request -> config))
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange()
 //                    .pathMatchers("/").permitAll()
@@ -66,6 +74,17 @@ public class SecurityConfiguration {
 //                    .and()
                 .build();
         // @formatter:on
+    }
+
+    @Bean
+    CorsWebFilter permissiveCorsFilter() {
+        return new CorsWebFilter(exchange -> {
+            CorsConfiguration config = new CorsConfiguration();
+            config.addAllowedOrigin("*");
+            config.addAllowedHeader("*");
+            config.addAllowedMethod("*");
+            return config;
+        });
     }
 
     @Bean
