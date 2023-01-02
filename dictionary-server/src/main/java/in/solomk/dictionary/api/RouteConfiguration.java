@@ -6,10 +6,7 @@ import in.solomk.dictionary.api.handler.GetWordsHandler;
 import in.solomk.dictionary.api.handler.ProfileHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
@@ -27,28 +24,28 @@ public class RouteConfiguration {
         return RouterFunctions.route()
                               .GET("/api/users/{userId}/words", getWordsHandler)
                               .POST("/api/users/{userId}/words", addWordHandler)
-                              .POST("/api/token", authHandler)
+//                              .POST("/api/token", authHandler)
                               .GET("/api/me", profileHandler)
                               .resources("/**", new ClassPathResource("/public/"))
                               .GET("/**", indexPage)
                               .build();
     }
 
-    @Bean
-    @Profile("mongo")
-    CorsWebFilter corsFilter() {
-        return new CorsWebFilter(exchange -> new CorsConfiguration().applyPermitDefaultValues());
-    }
-
-    @Bean
-    @Profile("!mongo")
-    CorsWebFilter permissiveCorsFilter() {
-        return new CorsWebFilter(exchange -> {
-            CorsConfiguration config = new CorsConfiguration();
-            config.addAllowedOrigin("*");
-            config.addAllowedHeader("*");
-            config.addAllowedMethod("*");
-            return config;
-        });
-    }
+//    @Bean
+//    @Profile("mongo")
+//    CorsWebFilter corsFilter() {
+//        return new CorsWebFilter(exchange -> new CorsConfiguration().applyPermitDefaultValues());
+//    }
+//
+//    @Bean
+//    @Profile("!mongo")
+//    CorsWebFilter permissiveCorsFilter() {
+//        return new CorsWebFilter(exchange -> {
+//            CorsConfiguration config = new CorsConfiguration();
+//            config.addAllowedOrigin("*");
+//            config.addAllowedHeader("*");
+//            config.addAllowedMethod("*");
+//            return config;
+//        });
+//    }
 }
