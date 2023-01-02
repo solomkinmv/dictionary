@@ -1,6 +1,6 @@
-import {UnsavedWord} from "./unsaved-word"
+import {Word} from "./word";
 
 export interface UserWords {
     readonly userId: string
-    readonly words: Map<String, UnsavedWord>
+    readonly words: Record<string, Word>
 }

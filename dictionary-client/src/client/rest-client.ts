@@ -1,14 +1,16 @@
 export class RestClient {
 
-    async get(url: string, params: Record<string, string> = {}) {
+    async get(url: string,
+              token?: string,
+              params?: Record<string, string>) {
         const urlObject = new URL(url)
-        for (let key in params) {
-            urlObject.searchParams.append(key, params[key])
-        }
-        console.log('Getting by url', urlObject.toString())
-        console.log('Parameters ', params)
+        this.fillSearchParams(urlObject, params);
+
+        let headers = this.fillBearerHeader(token);
+
         const response = await fetch(urlObject, {
-            method: 'GET'
+            method: 'GET',
+            headers: headers
         })
         console.log('Received response on get', response)
         if (response.status === 404) {
@@ -22,12 +24,30 @@ export class RestClient {
         }
     }
 
-    async post(url: string, body: any) {
+    private fillSearchParams(url: URL, params: Record<string, string> | undefined): void {
+        if (params) {
+            for (let key in params) {
+                url.searchParams.append(key, params[key])
+            }
+        }
+    }
+
+    private fillBearerHeader(token: string | undefined): Record<string, string> {
+        if (token) {
+            return {
+                "Authorization": `Bearer ${token}`
+            }
+        }
+        return {};
+    }
+
+    async post(url: string, token?: string, body?: any) {
+        let headers = this.fillBearerHeader(token);
+        headers['Content-Type'] = 'application/json'
+
         const response = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: headers,
             mode: 'cors',
             body: JSON.stringify(body)
         })

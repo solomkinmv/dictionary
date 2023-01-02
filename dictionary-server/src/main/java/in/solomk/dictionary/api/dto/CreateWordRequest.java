@@ -1,7 +1,7 @@
 package in.solomk.dictionary.api.dto;
 
 public record CreateWordRequest(
-        String word,
+        String wordText,
         String translation
 ) {
 }

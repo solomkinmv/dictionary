@@ -21,7 +21,7 @@ public class UsersWordsService {
     }
 
     public Mono<Word> saveWord(String userId, UnsavedWord unsavedWord) {
-        Word wordWithId = new Word(UUID.randomUUID().toString(), unsavedWord.word(), null, unsavedWord.translation());
+        Word wordWithId = new Word(UUID.randomUUID().toString(), unsavedWord.wordText(), null, unsavedWord.translation());
         return repository.getUserWords(userId)
                          .switchIfEmpty(Mono.just(UserWords.of(userId)))
                          .map(userWords -> userWords.addWord(wordWithId))

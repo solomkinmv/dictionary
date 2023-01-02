@@ -7,7 +7,7 @@ import reportWebVitals from "./reportWebVitals";
 import Home from "./components/home/Home";
 import WordsComponent from "./components/words/WordsComponent";
 import Login from "./components/login/LoginComponent";
-import AuthorizationFinishedComponent from "./components/authorization/AuthorizationFinishedComponent";
+import AuthorizationComponent from "./components/authorization/AuthorizationComponent";
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
@@ -19,7 +19,7 @@ root.render(
                     <Route path="/login" element={<Login/>}/>
                     <Route path="/words" element={<WordsComponent/>}/>
                     {/*<Route path="/authorized/:provider" element={<AuthorizationComponent/>}/>*/}
-                    <Route path="/authorized" element={<AuthorizationFinishedComponent/>}/>
+                    <Route path="/authorized" element={<AuthorizationComponent/>}/>
                     <Route
                         path="*"
                         element={
