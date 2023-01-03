@@ -22,8 +22,8 @@ public class RouteConfiguration {
                                                   AuthHandler authHandler) {
         HandlerFunction<ServerResponse> indexPage = (req) -> ServerResponse.ok().bodyValue(new ClassPathResource("public/index.html"));
         return RouterFunctions.route()
-                              .GET("/api/users/{userId}/words", getWordsHandler)
-                              .POST("/api/users/{userId}/words", addWordHandler)
+                              .GET("/api/words", getWordsHandler)
+                              .POST("/api/words", addWordHandler)
 //                              .POST("/api/token", authHandler)
                               .GET("/api/me", profileHandler)
                               .resources("/**", new ClassPathResource("/public/"))

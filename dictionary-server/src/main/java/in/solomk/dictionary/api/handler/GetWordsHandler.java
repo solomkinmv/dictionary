@@ -12,6 +12,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.security.Principal;
+
 @Component
 @AllArgsConstructor
 public class GetWordsHandler implements HandlerFunction<ServerResponse> {
@@ -22,11 +24,14 @@ public class GetWordsHandler implements HandlerFunction<ServerResponse> {
     @Override
     @RegisterReflectionForBinding(value = UserWordsResponse.class)
     public Mono<ServerResponse> handle(ServerRequest request) {
-        return usersWordsService.getUserWords(request.pathVariable("userId"))
-                                .map(mapper::toUserWordsResponse)
-                                .flatMap(userWordsResponse -> ServerResponse.ok()
-                                                                            .contentType(MediaType.APPLICATION_JSON)
-                                                                            .bodyValue(userWordsResponse))
-                                .switchIfEmpty(ServerResponse.notFound().build());
+        return request.principal()
+                .map(Principal::getName)
+                .flatMap(usersWordsService::getUserWords)
+                .map(mapper::toUserWordsResponse)
+                .flatMap(userWordsResponse -> ServerResponse.ok()
+                                                            .contentType(MediaType.APPLICATION_JSON)
+                                                            .bodyValue(userWordsResponse))
+                .switchIfEmpty(ServerResponse.notFound()
+                                             .build());
     }
 }

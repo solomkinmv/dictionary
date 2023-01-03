@@ -12,6 +12,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.security.Principal;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @AllArgsConstructor
@@ -24,11 +26,12 @@ public class AddWordHandler implements HandlerFunction<ServerResponse> {
     @Override
     @RegisterReflectionForBinding(value = WordResponse.class)
     public Mono<ServerResponse> handle(ServerRequest request) {
-        String userId = request.pathVariable("userId");
-        return ServerResponse.ok()
-                             .contentType(APPLICATION_JSON)
-                             .body(addWord(request, userId),
-                                   WordResponse.class);
+        return request.principal()
+                .map(Principal::getName)
+                .flatMap(userId -> ServerResponse.ok()
+                                                 .contentType(APPLICATION_JSON)
+                                                 .body(addWord(request, userId),
+                                                       WordResponse.class));
     }
 
     private Mono<WordResponse> addWord(ServerRequest request, String userId) {
