@@ -53,14 +53,11 @@ public class SecurityConfiguration {
         config.addAllowedOrigin("*");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
-//            return config;
         return http
                 .csrf().disable()
                 .cors(corsSpec -> corsSpec.configurationSource(request -> config))
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange()
-//                    .pathMatchers("/").permitAll()
-//                    .pathMatchers("/logout").permitAll()
                     .anyExchange()
                     .authenticated()
                     .and()
