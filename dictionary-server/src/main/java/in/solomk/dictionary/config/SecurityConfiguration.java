@@ -73,9 +73,6 @@ public class SecurityConfiguration {
                 .oauth2Login()
                     .authenticationSuccessHandler(jwtServerAuthenticationSuccessHandler)
                     .and()
-//                .logout()
-//                    .logoutHandler(logoutHandler)
-//                    .and()
                 .build();
         // @formatter:on
     }
