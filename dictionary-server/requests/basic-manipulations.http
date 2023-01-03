@@ -2,11 +2,11 @@
 GET {{dictionary-server-host}}/
 
 ### Get user words
-GET {{dictionary-server-host}}/api/users/106465616438964035743/words
+GET {{dictionary-server-host}}/api/words
 Authorization: Bearer {{auth_token}}
 
 ### Add user word
-POST {{dictionary-server-host}}/api/users/106465616438964035743/words
+POST {{dictionary-server-host}}/api/words
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
