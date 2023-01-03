@@ -8,6 +8,7 @@ import Home from "./components/home/Home";
 import WordsComponent from "./components/words/WordsComponent";
 import Login from "./components/login/LoginComponent";
 import AuthorizationComponent from "./components/authorization/AuthorizationComponent";
+import ProfileComponent from "./components/profile/ProfileComponent";
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
@@ -17,6 +18,7 @@ root.render(
                 <Route path="/" element={<App/>}>
                     <Route path="/" element={<Home/>}/>
                     <Route path="/login" element={<Login/>}/>
+                    <Route path="/profile" element={<ProfileComponent/>}/>
                     <Route path="/words" element={<WordsComponent/>}/>
                     {/*<Route path="/authorized/:provider" element={<AuthorizationComponent/>}/>*/}
                     <Route path="/authorized" element={<AuthorizationComponent/>}/>
