@@ -4,6 +4,7 @@ import {Word} from "./model/word";
 import {RestClient} from "./rest-client";
 import jwtDecode, {JwtPayload} from "jwt-decode";
 import {UserDetails} from "./model/user-details";
+import {getToken} from "../components/auth/authentication-helpers";
 
 export function dictionaryClient() {
     return new DictionaryClient(new RestClient())
@@ -25,7 +26,7 @@ class DictionaryClient {
     }
 
     async getWords(): Promise<UserWords> {
-        const token = this.extractJwtToken();
+        const token = getToken();
         const url = `${process.env.REACT_APP_DICTIONARY_SERVICE_API_HOST}/api/words`;
         console.debug('Getting user words', url)
         const userWords = await this.restClient.get(url, token)
@@ -34,7 +35,7 @@ class DictionaryClient {
     }
 
     getUserDetails(): UserDetails {
-        const token = this.extractJwtToken();
+        const token = getToken();
         const decodedToken = jwtDecode<JwtPayload>(token)
         const userId = decodedToken.sub
         if (!userId) {
