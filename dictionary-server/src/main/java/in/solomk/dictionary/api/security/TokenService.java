@@ -1,7 +1,6 @@
 package in.solomk.dictionary.api.security;
 
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -18,14 +17,14 @@ public class TokenService {
 
     private final JwtEncoder jwtEncoder;
 
-    public String generateToken(Authentication authentication) {
+    public String generateToken(String subjectId) {
         Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .audience(singletonList("dictionary"))
                 .issuer("dictionary")
                 .issuedAt(now)
                 .expiresAt(now.plus(1, ChronoUnit.HOURS))
-                .subject(authentication.getName())
+                .subject(subjectId)
                 .build();
         return jwtEncoder.encode(JwtEncoderParameters.from(claims))
                          .getTokenValue();

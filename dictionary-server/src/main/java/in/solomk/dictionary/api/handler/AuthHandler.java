@@ -11,6 +11,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.security.Principal;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -22,7 +24,8 @@ public class AuthHandler implements HandlerFunction<ServerResponse> {
     public Mono<ServerResponse> handle(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
-                .doOnNext(authentication -> log.info("Token requested for user: {}", authentication.getName()))
+                .map(Principal::getName)
+                .doOnNext(name -> log.info("Token requested for user: {}", name))
                 .map(tokenService::generateToken)
                 .doOnNext(token -> log.info("Generated token: {}", token))
                 .flatMap(token -> ServerResponse.ok()

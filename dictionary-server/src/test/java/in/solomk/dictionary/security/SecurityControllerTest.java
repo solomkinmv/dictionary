@@ -25,7 +25,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @MockBean(AddWordHandler.class)
 @RegisterReflectionForBinding(value = GetWordsHandler.class)
 public class SecurityControllerTest {
-
+    @Autowired
+    private TokenService tokenService;
     @Autowired
     private WebTestClient webTestClient;
 
@@ -40,14 +41,7 @@ public class SecurityControllerTest {
 
     @Test
     void whenAuthenticatedPrintsHello() {
-        String token = webTestClient.post()
-                                    .uri("/api/token")
-                                    .headers(httpHeaders -> httpHeaders.setBasicAuth("max", "password"))
-                                    .exchange()
-                                    .expectStatus().isOk()
-                                    .returnResult(String.class)
-                                    .getResponseBody()
-                                    .blockFirst();
+        String token = tokenService.generateToken("someUserId");
 
         webTestClient.get()
                      .uri("/api/me")

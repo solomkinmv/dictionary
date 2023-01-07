@@ -43,16 +43,18 @@ public class UserWordsTestClient {
                             .exchange();
     }
 
-    public WebTestClient.ResponseSpec addWord(String userId, CreateWordRequest request) {
+    public WebTestClient.ResponseSpec addWord(String token, CreateWordRequest request) {
         return webTestClient.post()
-                            .uri("/api/users/{id}/words", userId)
+                            .uri("/api/words")
+                            .header("Authorization", "Bearer " + token)
                             .bodyValue(request)
                             .exchange();
     }
 
-    public WebTestClient.ResponseSpec getUserWords(String userId) {
+    public WebTestClient.ResponseSpec getUserWords(String token) {
         return webTestClient.get()
-                            .uri("/api/users/{id}/words", userId)
+                            .uri("/api/words")
+                            .header("Authorization", "Bearer " + token)
                             .exchange();
     }
 }

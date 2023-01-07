@@ -1,6 +1,5 @@
 package in.solomk.dictionary.config;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -32,7 +31,6 @@ import org.springframework.web.cors.reactive.CorsWebFilter;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.util.Map;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -66,7 +64,6 @@ public class SecurityConfiguration {
 //                        .authenticationManager(jwtAuthenticationManager)
                         .and()
                     .and()
-//                    .and()
                 .oauth2Login()
                     .authenticationSuccessHandler(jwtServerAuthenticationSuccessHandler)
                     .and()
@@ -90,21 +87,13 @@ public class SecurityConfiguration {
                                                                                     ObjectMapper objectMapper) {
         return (webFilterExchange, authentication) -> {
             ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
-            String jsonResponse;
-            String jwt = tokenService.generateToken(authentication);
+            String jwt = tokenService.generateToken(authentication.getName());
             log.debug("Generated JWT: {}", jwt);
-            try {
-                jsonResponse = objectMapper.writeValueAsString(Map.of("jwt", jwt));
-            } catch (JsonProcessingException e) {
-                return Mono.error(e);
-            }
+
             return Mono.fromRunnable(() -> {
                 response.setStatusCode(HttpStatus.FOUND);
                 response.getHeaders().setLocation(URI.create("http://localhost:3000/authorized?jwt=" + jwt));
             });
-//            response.getHeaders().add("Content-Type", "application/json");
-//            return response.writeWith(Mono.just(response.bufferFactory()
-//                                                        .wrap(jsonResponse.getBytes())));
         };
     }
 
