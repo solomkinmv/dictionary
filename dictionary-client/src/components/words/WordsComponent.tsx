@@ -5,12 +5,11 @@ import AddWordComponent from "./AddWordComponent";
 
 function WordsComponent() {
 
-    const client = dictionaryClient();
-
     const [words, setWords] = useState<Word[]>([]);
 
     useEffect(() => {
-        client.getWords()
+        dictionaryClient()
+            .getWords()
             .then(userWords => {
                 setWords(Array.from(Object.values(userWords.words)));
             });
