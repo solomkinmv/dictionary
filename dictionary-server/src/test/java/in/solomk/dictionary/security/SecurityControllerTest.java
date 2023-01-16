@@ -7,11 +7,13 @@ import in.solomk.dictionary.api.handler.GetWordsHandler;
 import in.solomk.dictionary.api.handler.ProfileHandler;
 import in.solomk.dictionary.api.security.TokenService;
 import in.solomk.dictionary.config.SecurityConfiguration;
+import in.solomk.dictionary.service.user.UserProfileService;
 import org.junit.jupiter.api.Test;
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -21,8 +23,11 @@ import org.springframework.test.web.reactive.server.WebTestClient;
         TokenService.class,
         ProfileHandler.class,
         AuthHandler.class})
-@MockBean(GetWordsHandler.class)
-@MockBean(AddWordHandler.class)
+@MockBeans({
+        @MockBean(UserProfileService.class),
+        @MockBean(GetWordsHandler.class),
+        @MockBean(AddWordHandler.class)
+})
 @RegisterReflectionForBinding(value = GetWordsHandler.class)
 public class SecurityControllerTest {
     @Autowired
