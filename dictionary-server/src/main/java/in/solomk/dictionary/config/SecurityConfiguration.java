@@ -1,6 +1,5 @@
 package in.solomk.dictionary.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -8,6 +7,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import in.solomk.dictionary.api.security.TokenService;
+import in.solomk.dictionary.service.user.UserProfileService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -18,6 +18,8 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
@@ -28,7 +30,6 @@ import org.springframework.security.web.server.authentication.ServerAuthenticati
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
-import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
@@ -43,8 +44,6 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityWebFilterChain filterChain(ServerHttpSecurity http,
-//                                              ReactiveAuthenticationManager jwtAuthenticationManager,
-                                              ReactiveAuthenticationManager userAuthenticationManager,
                                               ServerAuthenticationSuccessHandler jwtServerAuthenticationSuccessHandler) {
         // @formatter:off
         CorsConfiguration config = new CorsConfiguration();
@@ -61,7 +60,6 @@ public class SecurityConfiguration {
                     .and()
                 .oauth2ResourceServer()
                     .jwt()
-//                        .authenticationManager(jwtAuthenticationManager)
                         .and()
                     .and()
                 .oauth2Login()
@@ -83,32 +81,29 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public ServerAuthenticationSuccessHandler jwtServerAuthenticationSuccessHandler(TokenService tokenService,
-                                                                                    ObjectMapper objectMapper) {
-        return (webFilterExchange, authentication) -> {
-            ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
-            String jwt = tokenService.generateToken(authentication.getName());
-            log.debug("Generated JWT: {}", jwt);
+    public ServerAuthenticationSuccessHandler jwtServerAuthenticationSuccessHandler(
+            TokenService tokenService,
+            UserProfileService userProfileService) {
 
-            return Mono.fromRunnable(() -> {
-                response.setStatusCode(HttpStatus.FOUND);
-                response.getHeaders().setLocation(URI.create("http://localhost:3000/authorized?jwt=" + jwt));
-            });
-        };
+        return (webFilterExchange, authentication) ->
+                userProfileService.getUserProfileBySocialProviderId("google", authentication.getName()) // currently support only google
+                        .map(userProfile -> tokenService.generateToken(userProfile.id()))
+                        .doOnNext(token -> {
+                            log.debug("Generated JWT: {}", token);
+                            ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
+                            response.setStatusCode(HttpStatus.FOUND);
+                            response.getHeaders().setLocation(URI.create("http://localhost:3000/authorized?jwt=" + token));
+                        })
+                        .then();
     }
 
-//    @Bean
-//    public MapReactiveUserDetailsService mapReactiveUserDetailsService() {
-//        return new MapReactiveUserDetailsService(User.withUsername("max")
-//                                                     .password("{noop}password")
-//                                                     .authorities("read")
-//                                                     .build());
-//    }
-//
-//    @Bean
-//    public ReactiveAuthenticationManager userAuthenticationManager(ReactiveUserDetailsService userDetailsService) {
-//        return new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
-//    }
+    @Bean
+    public ReactiveUserDetailsService jwtMappingUserDetailsService(UserProfileService userProfileService) {
+        return username -> userProfileService.getByUserId(username)
+                .map(userProfile -> User.builder()
+                        .username(userProfile.id())
+                        .build());
+    }
 
     @Bean
     public ReactiveAuthenticationManager jwtAuthenticationManager(ReactiveJwtDecoder jwtDecoder) {

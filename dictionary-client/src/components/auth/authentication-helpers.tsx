@@ -40,7 +40,11 @@ export function AuthProvider({children}: { children: React.ReactNode }) {
     };
 
     let isAuthenticated = () => {
-        return !!user && new Date().getTime() < expiresAt;
+        const authenticated = !!user && new Date().getTime() / 1000 < expiresAt;
+        console.log(`Checking if authenticated. Token is ${token},
+         user is ${user}, expires at ${expiresAt}, 
+         authenticated is ${authenticated}, current time is ${new Date().getTime()}`);
+        return authenticated;
     }
 
     let value = {user, token, signin, signout, isAuthenticated};
