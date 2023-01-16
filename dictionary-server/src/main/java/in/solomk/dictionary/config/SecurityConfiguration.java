@@ -8,8 +8,9 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import in.solomk.dictionary.api.security.TokenService;
 import in.solomk.dictionary.service.user.UserProfileService;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,15 +33,22 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 
 import java.net.URI;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 @Configuration
 @EnableWebFluxSecurity
 @EnableConfigurationProperties(RsaKeyProperties.class)
-@AllArgsConstructor
 @Slf4j
 public class SecurityConfiguration {
-
-    private final RsaKeyProperties rsaKeyProperties;
 
     @Bean
     public SecurityWebFilterChain filterChain(ServerHttpSecurity http,
@@ -111,17 +119,35 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public ReactiveJwtDecoder reactiveJwtDecoder() {
+    public ReactiveJwtDecoder reactiveJwtDecoder(RsaKeyProperties rsaKeyProperties) {
         return NimbusReactiveJwtDecoder.withPublicKey(rsaKeyProperties.publicKey())
                                        .build();
     }
 
     @Bean
-    public JwtEncoder jwtEncoder() {
+    public JwtEncoder jwtEncoder(RsaKeyProperties rsaKeyProperties) {
         JWK jwk = new RSAKey.Builder(rsaKeyProperties.publicKey())
                 .privateKey(rsaKeyProperties.privateKey())
                 .build();
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = {"rsa.private-key-content", "rsa.public-key-content"})
+    public RsaKeyProperties rsaKeyProperties(@Value("${rsa.public-key-content}") String publicKeyContent,
+                                             @Value("${rsa.private-key-content}") String privateKeyContent)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
+
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+
+        PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(
+                Base64.getMimeDecoder()
+                      .decode(privateKeyContent));
+        PrivateKey privateKey = kf.generatePrivate(keySpecPKCS8);
+
+        X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getMimeDecoder().decode(publicKeyContent));
+        PublicKey pubKey = kf.generatePublic(keySpecX509);
+        return new RsaKeyProperties((RSAPublicKey) pubKey, (RSAPrivateKey) privateKey);
     }
 }

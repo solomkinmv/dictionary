@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.MockBeans;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @WebFluxTest
@@ -28,6 +29,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
         @MockBean(GetWordsHandler.class),
         @MockBean(AddWordHandler.class)
 })
+@ActiveProfiles("test")
 @RegisterReflectionForBinding(value = GetWordsHandler.class)
 public class SecurityControllerTest {
     @Autowired
