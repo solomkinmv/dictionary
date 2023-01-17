@@ -1,4 +1,9 @@
+### Health
 GET {{dictionary-server-host}}/actuator/health
+
+### Info
+GET {{dictionary-server-host}}/actuator/info
+
 
 
 
