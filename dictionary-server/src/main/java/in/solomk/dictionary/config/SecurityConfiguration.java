@@ -10,8 +10,6 @@ import in.solomk.dictionary.api.security.TokenService;
 import in.solomk.dictionary.service.user.UserProfileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -35,8 +33,6 @@ import org.springframework.web.cors.reactive.CorsWebFilter;
 import java.net.URI;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -46,7 +42,6 @@ import java.util.Base64;
 
 @Configuration
 @EnableWebFluxSecurity
-@EnableConfigurationProperties(RsaKeyProperties.class)
 @Slf4j
 public class SecurityConfiguration {
 
@@ -134,20 +129,28 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(value = {"rsa.private-key-content", "rsa.public-key-content"})
-    public RsaKeyProperties rsaKeyProperties(@Value("${rsa.public-key-content}") String publicKeyContent,
-                                             @Value("${rsa.private-key-content}") String privateKeyContent)
+    public RsaKeyProperties rsaKeyProperties(@Value("${rsa.public-key-content:}") String publicKeyContent,
+                                             @Value("${rsa.private-key-content:}") String privateKeyContent,
+                                             @Value("${rsa.public-key:#{null}}") RSAPublicKey publicKey,
+                                             @Value("${rsa.private-key:#{null}}") RSAPrivateKey privateKey)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
+        log.info("Using RSA keys from application properties [publicKeyPresent={}, privateKeyPresent={}, publicKeyContent length = {}, privateKeyContent length = {}]",
+                 publicKey != null, privateKey != null, publicKeyContent.length(), privateKeyContent.length());
 
         KeyFactory kf = KeyFactory.getInstance("RSA");
 
-        PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(
-                Base64.getMimeDecoder()
-                      .decode(privateKeyContent));
-        PrivateKey privateKey = kf.generatePrivate(keySpecPKCS8);
-
-        X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getMimeDecoder().decode(publicKeyContent));
-        PublicKey pubKey = kf.generatePublic(keySpecX509);
-        return new RsaKeyProperties((RSAPublicKey) pubKey, (RSAPrivateKey) privateKey);
+        if (publicKey == null) {
+            if (publicKeyContent.isEmpty()) {
+                throw new IllegalStateException("RSA public key is not configured");
+            }
+            publicKey = (RSAPublicKey) kf.generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyContent)));
+        }
+        if (privateKey == null) {
+            if (privateKeyContent.isEmpty()) {
+                throw new IllegalStateException("RSA private key is not configured");
+            }
+            privateKey = (RSAPrivateKey) kf.generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyContent)));
+        }
+        return new RsaKeyProperties(publicKey, privateKey);
     }
 }
