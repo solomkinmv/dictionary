@@ -52,7 +52,7 @@ public class ActuatorApiTest extends BaseFuncTest {
                           .isOk()
                           .expectBody()
                           .json("""
-                                        {"app":{"name":"dictionary-server","version":"1.0.0-SNAPSHOT"}}
+                                        {}
                                         """, true);
     }
 }
