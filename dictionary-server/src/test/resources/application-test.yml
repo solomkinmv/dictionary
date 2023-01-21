@@ -1,7 +1,10 @@
+security.user:
+  name: admin
+  password: secret
+
 rsa:
   private-key: certs/private.pem
   public-key: certs/public.pem
-
 
 debug: true
 logging:

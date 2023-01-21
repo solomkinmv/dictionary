@@ -1,29 +1,16 @@
 package in.solomk.dictionary.ft.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import in.solomk.dictionary.api.dto.CreateWordRequest;
-import org.springframework.context.ApplicationContext;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.reactive.function.client.ExchangeStrategies;
+
 
 @Component
+@AllArgsConstructor
 public class UserWordsTestClient {
 
     private final WebTestClient webTestClient;
-
-    public UserWordsTestClient(ApplicationContext context, ObjectMapper mapper) {
-        var exchangeStrategiesWithCustomObjectMapper =
-                ExchangeStrategies.builder()
-                                  .codecs(configurer -> configurer.defaultCodecs()
-                                                                  .jackson2JsonDecoder(new Jackson2JsonDecoder(mapper)))
-                                  .build();
-        webTestClient = WebTestClient.bindToApplicationContext(context)
-                                     .configureClient()
-                                     .exchangeStrategies(exchangeStrategiesWithCustomObjectMapper)
-                                     .build();
-    }
 
     public WebTestClient.ResponseSpec getIndexPage() {
         return webTestClient.get()
@@ -58,3 +45,4 @@ public class UserWordsTestClient {
                             .exchange();
     }
 }
+

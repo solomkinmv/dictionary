@@ -29,11 +29,11 @@ public class GetUserWordsApiTest extends BaseFuncTest {
 
     @Test
     void addsWordForUser() {
-        WordResponse wordResponse = testClient.addWord(token, new CreateWordRequest("word-1", "meaning-1"))
-                                              .expectStatus().isOk()
-                                              .expectBody(WordResponse.class)
-                                              .returnResult()
-                                              .getResponseBody();
+        WordResponse wordResponse = userWordsTestClient.addWord(token, new CreateWordRequest("word-1", "meaning-1"))
+                                                       .expectStatus().isOk()
+                                                       .expectBody(WordResponse.class)
+                                                       .returnResult()
+                                                       .getResponseBody();
 
         assertThat(wordResponse).isNotNull();
         assertThat(wordResponse)
@@ -46,11 +46,11 @@ public class GetUserWordsApiTest extends BaseFuncTest {
     }
 
     private void verifyUserWordsResponse(UserWordsResponse expectedValue) {
-        testClient.getUserWords(token)
-                  .expectStatus()
-                  .isOk()
-                  .expectBody(UserWordsResponse.class)
-                  .isEqualTo(expectedValue);
+        userWordsTestClient.getUserWords(token)
+                           .expectStatus()
+                           .isOk()
+                           .expectBody(UserWordsResponse.class)
+                           .isEqualTo(expectedValue);
     }
 
 }

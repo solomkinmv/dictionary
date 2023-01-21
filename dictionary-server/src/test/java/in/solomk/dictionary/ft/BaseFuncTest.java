@@ -1,6 +1,7 @@
 package in.solomk.dictionary.ft;
 
 import in.solomk.dictionary.api.security.TokenService;
+import in.solomk.dictionary.ft.client.ActuatorTestClient;
 import in.solomk.dictionary.ft.client.UserWordsTestClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,7 +25,9 @@ public class BaseFuncTest {
     }
 
     @Autowired
-    protected UserWordsTestClient testClient;
+    protected UserWordsTestClient userWordsTestClient;
+    @Autowired
+    protected ActuatorTestClient actuatorTestClient;
     @Autowired
     protected TokenService tokenService;
 

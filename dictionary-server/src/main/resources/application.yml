@@ -18,6 +18,17 @@ spring:
             token-uri: ${OKTA_OAUTH2_DOMAIN}.auth0.com/oauth/token
             jwk-set-uri: ${OKTA_OAUTH2_DOMAIN}.auth0.com/.well-known/jwks.json
 
+management:
+  endpoint:
+    web:
+      exposure:
+        include: health,info
+    info:
+      enabled: true
+    health:
+      roles: ACTUATOR
+      show-components: always
+      show-details: always
 
 debug: true
 logging:

@@ -12,13 +12,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.security.authentication.DelegatingReactiveAuthenticationManager;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
+import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
@@ -46,8 +52,9 @@ import java.util.Base64;
 public class SecurityConfiguration {
 
     @Bean
-    public SecurityWebFilterChain filterChain(ServerHttpSecurity http,
-                                              ServerAuthenticationSuccessHandler jwtServerAuthenticationSuccessHandler) {
+    SecurityWebFilterChain filterChain(ServerHttpSecurity http,
+                                       ServerAuthenticationSuccessHandler jwtServerAuthenticationSuccessHandler,
+                                       ReactiveAuthenticationManager httpBasicAuthenticationManager) {
         // @formatter:off
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOrigin("*");
@@ -55,20 +62,27 @@ public class SecurityConfiguration {
         config.addAllowedMethod("*");
         return http
                 .csrf().disable()
-                .cors(corsSpec -> corsSpec.configurationSource(request -> config))
-                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+                       .cors(corsSpec -> corsSpec.configurationSource(request -> config))
+                       .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange()
-                    .anyExchange()
-                    .authenticated()
+                    .pathMatchers("/api/**").authenticated()
+//                    .anyExchange()
+//                    .authenticated()
+                    .pathMatchers("/actuator/health").permitAll()
+                    .pathMatchers("/actuator/**").hasRole("ACTUATOR")
+//                    .permitAll()
+                    .and()
+                .httpBasic()
+                    .authenticationManager(httpBasicAuthenticationManager)
                     .and()
                 .oauth2ResourceServer()
                     .jwt()
                         .and()
-                    .and()
+                        .and()
                 .oauth2Login()
                     .authenticationSuccessHandler(jwtServerAuthenticationSuccessHandler)
                     .and()
-                .build();
+                    .build();
         // @formatter:on
     }
 
@@ -81,6 +95,23 @@ public class SecurityConfiguration {
             config.addAllowedMethod("*");
             return config;
         });
+    }
+
+    @Bean
+    UserDetailsRepositoryReactiveAuthenticationManager httpBasicAuthenticationManager(
+            ReactiveUserDetailsService httpBasicUserDetailsService) {
+        return new UserDetailsRepositoryReactiveAuthenticationManager(httpBasicUserDetailsService);
+    }
+
+    @Bean
+    MapReactiveUserDetailsService httpBasicUserDetailsService(@Value("${security.user.name}") String username,
+                                                              @Value("${security.user.password}") String password,
+                                                              PasswordEncoder passwordEncoder) {
+        return new MapReactiveUserDetailsService(User.builder()
+                                                         .username(username)
+                                                         .password(passwordEncoder.encode(password))
+                                                         .roles("ACTUATOR")
+                                                         .build());
     }
 
     @Bean
@@ -101,11 +132,10 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public ReactiveUserDetailsService jwtMappingUserDetailsService(UserProfileService userProfileService) {
-        return username -> userProfileService.getByUserId(username)
-                .map(userProfile -> User.builder()
-                        .username(userProfile.id())
-                        .build());
+    @Primary
+    public DelegatingReactiveAuthenticationManager delegatingReactiveAuthenticationManager(ReactiveAuthenticationManager jwtAuthenticationManager,
+                                                                                           ReactiveAuthenticationManager httpBasicAuthenticationManager) {
+        return new DelegatingReactiveAuthenticationManager(jwtAuthenticationManager, httpBasicAuthenticationManager);
     }
 
     @Bean
@@ -143,14 +173,19 @@ public class SecurityConfiguration {
             if (publicKeyContent.isEmpty()) {
                 throw new IllegalStateException("RSA public key is not configured");
             }
-            publicKey = (RSAPublicKey) kf.generatePublic(new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyContent)));
+            publicKey = (RSAPublicKey) kf.generatePublic(new X509EncodedKeySpec(Base64.getMimeDecoder().decode(publicKeyContent)));
         }
         if (privateKey == null) {
             if (privateKeyContent.isEmpty()) {
                 throw new IllegalStateException("RSA private key is not configured");
             }
-            privateKey = (RSAPrivateKey) kf.generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyContent)));
+            privateKey = (RSAPrivateKey) kf.generatePrivate(new PKCS8EncodedKeySpec(Base64.getMimeDecoder().decode(privateKeyContent)));
         }
         return new RsaKeyProperties(publicKey, privateKey);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }
