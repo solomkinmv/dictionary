@@ -1,9 +1,23 @@
+### Actuator
+GET {{dictionary-server-host}}/actuator
+Authorization: Basic admin secret
+
 ### Health
 GET {{dictionary-server-host}}/actuator/health
 
+### Health with auth
+GET {{dictionary-server-host}}/actuator/health
+Authorization: Basic admin secret
+
 ### Info
 GET {{dictionary-server-host}}/actuator/info
+Authorization: Basic admin secret
 
+### Env
+GET {{dictionary-server-host}}/actuator/env
+Authorization: Basic admin secret
 
-
+### Config Props
+GET {{dictionary-server-host}}/actuator/configprops
+Authorization: Basic admin secret
 

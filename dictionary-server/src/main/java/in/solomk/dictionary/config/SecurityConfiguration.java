@@ -55,22 +55,20 @@ public class SecurityConfiguration {
     SecurityWebFilterChain filterChain(ServerHttpSecurity http,
                                        ServerAuthenticationSuccessHandler jwtServerAuthenticationSuccessHandler,
                                        ReactiveAuthenticationManager httpBasicAuthenticationManager) {
-        // @formatter:off
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOrigin("*");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
+        // @formatter:off
         return http
                 .csrf().disable()
                        .cors(corsSpec -> corsSpec.configurationSource(request -> config))
                        .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange()
                     .pathMatchers("/api/**").authenticated()
-//                    .anyExchange()
-//                    .authenticated()
                     .pathMatchers("/actuator/health").permitAll()
                     .pathMatchers("/actuator/**").hasRole("ACTUATOR")
-//                    .permitAll()
+                    .pathMatchers("/**").permitAll()
                     .and()
                 .httpBasic()
                     .authenticationManager(httpBasicAuthenticationManager)
@@ -117,7 +115,8 @@ public class SecurityConfiguration {
     @Bean
     public ServerAuthenticationSuccessHandler jwtServerAuthenticationSuccessHandler(
             TokenService tokenService,
-            UserProfileService userProfileService) {
+            UserProfileService userProfileService,
+            @Value("${security.redirect.web:}") String redirectWeb) {
 
         return (webFilterExchange, authentication) ->
                 userProfileService.getUserProfileBySocialProviderId("google", authentication.getName()) // currently support only google
@@ -126,7 +125,7 @@ public class SecurityConfiguration {
                             log.debug("Generated JWT: {}", token);
                             ServerHttpResponse response = webFilterExchange.getExchange().getResponse();
                             response.setStatusCode(HttpStatus.FOUND);
-                            response.getHeaders().setLocation(URI.create("http://localhost:3000/authorized?jwt=" + token));
+                            response.getHeaders().setLocation(URI.create(redirectWeb + "/authorized?jwt=" + token));
                         })
                         .then();
     }

@@ -1,6 +1,5 @@
 package in.solomk.dictionary.ft;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class ActuatorApiTest extends BaseFuncTest {
@@ -12,8 +11,9 @@ public class ActuatorApiTest extends BaseFuncTest {
                           .isOk()
                           .expectBody()
                           .json("""
-                                        {"status":"UP"}
-                                        """);
+                                        {
+                                          "status": "UP"
+                                        }""", true);
     }
 
     @Test
@@ -23,12 +23,29 @@ public class ActuatorApiTest extends BaseFuncTest {
                           .isOk()
                           .expectBody()
                           .json("""
-                                        {"status":"UP"}
-                                        """);
+                                        {
+                                          "status": "UP",
+                                          "components": {
+                                            "diskSpace": {
+                                              "status": "UP",
+                                              "details": {
+                                                "exists": true
+                                              }
+                                            },
+                                            "mongo": {
+                                              "status": "UP",
+                                              "details": {
+                                                "maxWireVersion": 13
+                                              }
+                                            },
+                                            "ping": {
+                                              "status": "UP"
+                                            }
+                                          }
+                                        }""", false);
     }
 
     @Test
-    @Disabled
     void returnsInfo() {
         actuatorTestClient.getInfo(true)
                           .expectStatus()
@@ -36,6 +53,6 @@ public class ActuatorApiTest extends BaseFuncTest {
                           .expectBody()
                           .json("""
                                         {"app":{"name":"dictionary-server","version":"1.0.0-SNAPSHOT"}}
-                                        """);
+                                        """, true);
     }
 }

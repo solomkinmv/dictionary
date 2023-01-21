@@ -19,16 +19,15 @@ spring:
             jwk-set-uri: ${OKTA_OAUTH2_DOMAIN}.auth0.com/.well-known/jwks.json
 
 management:
-  endpoint:
+  endpoints:
     web:
       exposure:
-        include: health,info
-    info:
-      enabled: true
+        include: health,info,env,metrics,loggers,configprops
+  endpoint:
     health:
       roles: ACTUATOR
-      show-components: always
-      show-details: always
+      show-components: when_authorized
+      show-details: when_authorized
 
 debug: true
 logging:
