@@ -6,6 +6,7 @@ spring:
           google:
             client-id: ${GOOGLE_OAUTH2_CLIENT_ID}
             client-secret: ${GOOGLE_OAUTH2_CLIENT_SECRET}
+            redirect-uri: "https://{baseHost}{basePort}{basePath}/{action}/oauth2/code/{registrationId}"
           facebook:
             client-id: ${FACEBOOK_OAUTH2_CLIENT_ID}
             client-secret: ${FACEBOOK_OAUTH2_CLIENT_SECRET}
@@ -28,10 +29,3 @@ management:
       roles: ACTUATOR
       show-components: when_authorized
       show-details: when_authorized
-
-debug: true
-logging:
-  level:
-    org:
-      springframework:
-        security: TRACE

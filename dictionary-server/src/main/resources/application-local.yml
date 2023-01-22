@@ -1,0 +1,14 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+
+debug: true
+logging:
+  level:
+    org:
+      springframework:
+        security: TRACE
