@@ -43,7 +43,7 @@ jobs:
       - name: Upload test coverage to Codecov
         uses: codecov/codecov-action@v3.1.1
         with:
-          file: ./dictionary-server/build/jacoco/test.exec
+          file: ./dictionary-server/build/reports/jacoco/test
 
   build-client:
     runs-on: ubuntu-latest
