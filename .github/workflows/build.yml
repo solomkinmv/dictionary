@@ -34,7 +34,7 @@ jobs:
         run: |
           cd dictionary-client
           npm install
-          npm run build
+          npm run build:production
 
       - name: Build server
         run: |
