@@ -3,7 +3,11 @@ plugins {
     jacoco
     id("org.springframework.boot") version "3.0.2"
     id("io.spring.dependency-management") version "1.1.0"
+    /*
+    temporary disabled due to absence of Mockito support and strange behavior of native build (Spring Security not working as with JVM)
+    https://github.com/spring-projects/spring-boot/issues/32195
     id("org.graalvm.buildtools.native") version "0.9.19"
+     */
     id("pl.allegro.tech.build.axion-release") version "1.14.3"
     id("io.freefair.lombok") version "6.6.1"
 }
@@ -69,3 +73,13 @@ tasks.jacocoTestReport {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+/*
+Custom configuration for native build on ARM
+
+tasks.withType<BootBuildImage> {
+    if (org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentArchitecture().isArm()) {
+        builder.set("dashaun/builder-arm:tiny")
+    }
+}
+ */

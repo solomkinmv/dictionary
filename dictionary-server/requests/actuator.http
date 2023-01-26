@@ -17,6 +17,10 @@ Authorization: Basic admin secret
 GET {{dictionary-server-host}}/actuator/env
 Authorization: Basic admin secret
 
+### Beans
+GET {{dictionary-server-host}}/actuator/beans
+Authorization: Basic admin secret
+
 ### Config Props
 GET {{dictionary-server-host}}/actuator/configprops
 Authorization: Basic admin secret
