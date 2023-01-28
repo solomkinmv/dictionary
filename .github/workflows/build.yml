@@ -73,12 +73,11 @@ jobs:
         if: "!contains(github.event.head_commit.message, '[skip release]')"
         run: |
           cd dictionary-server
-          ./gradlew bootBuildImage --imageName=solomkinmv/dictionary:latest
+          ./gradlew bootBuildImage
 
       - name: Push Docker image
         if: "!contains(github.event.head_commit.message, '[skip release]')"
         run: |
-          docker tag $(./gradlew cV -q -Prelease.quiet) solomkinmv/dictionary:latest
           docker push --all-tags solomkinmv/dictionary:latest
 
       - name: Increment version

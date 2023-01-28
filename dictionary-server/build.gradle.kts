@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
+
 plugins {
     java
     jacoco
@@ -74,12 +76,14 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-/*
-Custom configuration for native build on ARM
-
 tasks.withType<BootBuildImage> {
+    imageName.set("solomkinmv/dictionary")
+    tags.set(listOf("${imageName.get()}:${project.version}", "${imageName.get()}:latest"))
+    /*
+    Custom configuration for native build on ARM
     if (org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentArchitecture().isArm()) {
         builder.set("dashaun/builder-arm:tiny")
     }
+     */
 }
- */
+
