@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.MockBeans;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -23,12 +23,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
         SecurityConfiguration.class,
         TokenService.class,
         ProfileHandler.class,
-        AuthHandler.class})
-@MockBeans({
-        @MockBean(UserProfileService.class),
-        @MockBean(GetWordsHandler.class),
-        @MockBean(AddWordHandler.class)
-})
+        AuthHandler.class,
+        SecurityControllerTest.TestConfig.class})
 @ActiveProfiles("test")
 @RegisterReflectionForBinding(value = GetWordsHandler.class)
 public class SecurityControllerTest {
@@ -59,4 +55,21 @@ public class SecurityControllerTest {
                      .jsonPath("$.message", "Hello, max");
     }
 
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public UserProfileService userProfileService() {
+            return new UserProfileService(null);
+        }
+
+        @Bean
+        public GetWordsHandler getWordsHandler() {
+            return new GetWordsHandler(null, null);
+        }
+
+        @Bean
+        public AddWordHandler addWordHandler() {
+            return new AddWordHandler(null, null);
+        }
+    }
 }

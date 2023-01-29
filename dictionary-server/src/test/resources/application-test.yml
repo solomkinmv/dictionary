@@ -3,8 +3,8 @@ security.user:
   password: secret
 
 rsa:
-  private-key: certs/private.pem
-  public-key: certs/public.pem
+  private-key: /Users/msolomkin/Projects/dictionary/dictionary-server/src/test/resources/certs/private.pem
+  public-key: /Users/msolomkin/Projects/dictionary/dictionary-server/src/test/resources/certs/public.pem
 
 debug: true
 logging:

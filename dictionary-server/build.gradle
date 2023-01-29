@@ -1,15 +1,15 @@
-import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 plugins {
-    java
-    jacoco
+    id "java"
+    id "jacoco"
     id("org.springframework.boot") version "3.0.2"
     id("io.spring.dependency-management") version "1.1.0"
     /*
     temporary disabled due to absence of Mockito support and strange behavior of native build (Spring Security not working as with JVM)
     https://github.com/spring-projects/spring-boot/issues/32195
-    id("org.graalvm.buildtools.native") version "0.9.19"
      */
+    id("org.graalvm.buildtools.native") version "0.9.19"
     id("pl.allegro.tech.build.axion-release") version "1.14.3"
     id("io.freefair.lombok") version "6.6.1"
 }
@@ -23,12 +23,6 @@ scmVersion {
 group = "in.solomk"
 project.version = scmVersion.version
 java.sourceCompatibility = JavaVersion.VERSION_17
-
-configurations {
-    compileOnly {
-        extendsFrom(configurations.annotationProcessor.get())
-    }
-}
 
 repositories {
     mavenCentral()
@@ -46,44 +40,41 @@ dependencies {
 
     // tools
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-    implementation("org.mapstruct:mapstruct:${property("mapstructVersion")}")
-    annotationProcessor("org.mapstruct:mapstruct-processor:${property("mapstructVersion")}")
+    implementation("org.mapstruct:mapstruct:${mapstructVersion}")
+    annotationProcessor("org.mapstruct:mapstruct-processor:${mapstructVersion}")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mongodb")
-    implementation("pl.rzrz:assertj-reactor:${property("assertjReactorVersion")}")
+    implementation("pl.rzrz:assertj-reactor:${assertjReactorVersion}")
 }
 
 dependencyManagement {
     imports {
-        mavenBom("org.testcontainers:testcontainers-bom:${property("testcontainersVersion")}")
+        mavenBom("org.testcontainers:testcontainers-bom:${testcontainersVersion}")
     }
 }
 
-tasks.test {
-    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
-}
-
-tasks.jacocoTestReport {
-    dependsOn(tasks.test) // tests are required to run before generating the report
-
-    reports.xml.required.set(true)
-}
-
-tasks.withType<Test> {
+test {
+    finalizedBy jacocoTestReport // report is always generated after tests run
     useJUnitPlatform()
 }
 
-tasks.withType<BootBuildImage> {
-    imageName.set("solomkinmv/dictionary")
-    tags.set(listOf("${imageName.get()}:${project.version}", "${imageName.get()}:latest"))
-    /*
-    Custom configuration for native build on ARM
-    if (org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentArchitecture().isArm()) {
-        builder.set("dashaun/builder-arm:tiny")
+jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
+    reports {
+        xml.required = true
     }
-     */
 }
 
+bootBuildImage {
+    imageName = "solomkinmv/dictionary"
+    tags = ["${imageName}:${project.version}-native", "${imageName}:latest-native"]
+    /*
+    Custom configuration for native build on ARM
+    */
+    if (DefaultNativePlatform.getCurrentArchitecture().isArm()) {
+        builder.set("dashaun/builder-arm:tiny")
+    }
+}

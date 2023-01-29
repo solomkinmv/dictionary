@@ -37,7 +37,12 @@ import org.springframework.security.web.server.context.NoOpServerSecurityContext
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
@@ -164,25 +169,29 @@ public class SecurityConfiguration {
     @Bean
     public RsaKeyProperties rsaKeyProperties(@Value("${rsa.public-key-content:}") String publicKeyContent,
                                              @Value("${rsa.private-key-content:}") String privateKeyContent,
-                                             @Value("${rsa.public-key:#{null}}") RSAPublicKey publicKey,
-                                             @Value("${rsa.private-key:#{null}}") RSAPrivateKey privateKey)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
+                                             @Value("${rsa.public-key:#{null}}") String publicKeyPath,
+                                             @Value("${rsa.private-key:#{null}}") String privateKeyPath) throws GeneralSecurityException, IOException {
         log.info("Using RSA keys from application properties [publicKeyPresent={}, privateKeyPresent={}, publicKeyContent length = {}, privateKeyContent length = {}]",
-                 publicKey != null, privateKey != null, publicKeyContent.length(), privateKeyContent.length());
+                 publicKeyPath != null, privateKeyPath != null, publicKeyContent.length(), privateKeyContent.length());
 
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-
-        if (publicKey == null) {
+        RSAPublicKey publicKey;
+        if (publicKeyPath == null) {
             if (publicKeyContent.isEmpty()) {
                 throw new IllegalStateException("RSA public key is not configured");
             }
-            publicKey = (RSAPublicKey) kf.generatePublic(new X509EncodedKeySpec(Base64.getMimeDecoder().decode(publicKeyContent)));
+            publicKey = JavaSecurityPemUtils.parseX509PublicKey(publicKeyContent);
+        } else {
+            publicKey = JavaSecurityPemUtils.readX509PublicKey(new File(publicKeyPath));
         }
-        if (privateKey == null) {
+
+        RSAPrivateKey privateKey;
+        if (privateKeyPath == null) {
             if (privateKeyContent.isEmpty()) {
                 throw new IllegalStateException("RSA private key is not configured");
             }
-            privateKey = (RSAPrivateKey) kf.generatePrivate(new PKCS8EncodedKeySpec(Base64.getMimeDecoder().decode(privateKeyContent)));
+            privateKey = JavaSecurityPemUtils.parsePKSC8PrivateKey(privateKeyContent);
+        } else {
+            privateKey = JavaSecurityPemUtils.readPKCS8PrivateKey(new File(privateKeyPath));
         }
         return new RsaKeyProperties(publicKey, privateKey);
     }
@@ -191,4 +200,46 @@ public class SecurityConfiguration {
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
+}
+
+class JavaSecurityPemUtils {
+
+    public static RSAPrivateKey readPKCS8PrivateKey(File file) throws GeneralSecurityException, IOException {
+        String key = Files.readString(file.toPath(), Charset.defaultCharset());
+
+        return parsePKSC8PrivateKey(key);
+    }
+
+    public static RSAPrivateKey parsePKSC8PrivateKey(String key) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        String privateKeyPEM = key
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replaceAll(System.lineSeparator(), "")
+                .replace("-----END PRIVATE KEY-----", "");
+
+        byte[] encoded = Base64.getMimeDecoder().decode(privateKeyPEM);
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
+        return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
+    }
+
+    public static RSAPublicKey readX509PublicKey(File file) throws GeneralSecurityException, IOException {
+        String key = Files.readString(file.toPath(), Charset.defaultCharset());
+
+        return parseX509PublicKey(key);
+    }
+
+    public static RSAPublicKey parseX509PublicKey(String key) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        String publicKeyPEM = key
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replaceAll(System.lineSeparator(), "")
+                .replace("-----END PUBLIC KEY-----", "");
+
+        byte[] encoded = Base64.getMimeDecoder().decode(publicKeyPEM);
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
+        return (RSAPublicKey) keyFactory.generatePublic(keySpec);
+    }
+
 }

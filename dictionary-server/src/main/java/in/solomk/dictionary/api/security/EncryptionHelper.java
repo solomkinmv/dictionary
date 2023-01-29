@@ -12,6 +12,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 
+// todo: delete
 public class EncryptionHelper {
 
     private static final SecureRandom RANDOM = new SecureRandom();
