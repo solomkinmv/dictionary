@@ -2,7 +2,10 @@ package in.solomk.dictionary.ft;
 
 import in.solomk.dictionary.api.security.TokenService;
 import in.solomk.dictionary.ft.client.ActuatorTestClient;
+import in.solomk.dictionary.ft.client.UserLanguagesTestClient;
 import in.solomk.dictionary.ft.client.UserWordsTestClient;
+import in.solomk.dictionary.service.user.UserProfileService;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -12,6 +15,8 @@ import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static java.util.Objects.requireNonNull;
 
 @SpringBootTest
 @ActiveProfiles({"test"})
@@ -25,11 +30,18 @@ public class BaseFuncTest {
     }
 
     @Autowired
+    protected UserLanguagesTestClient userLanguagesTestClient;
+
+    @Autowired
     protected UserWordsTestClient userWordsTestClient;
+    protected String userId;
     @Autowired
     protected ActuatorTestClient actuatorTestClient;
+    protected String userToken;
     @Autowired
-    protected TokenService tokenService;
+    private TokenService tokenService;
+    @Autowired
+    private UserProfileService userProfileService;
 
     @DynamicPropertySource
     static void redisProperties(DynamicPropertyRegistry registry) {
@@ -39,5 +51,14 @@ public class BaseFuncTest {
 
     protected String generateId() {
         return String.valueOf(idGenerator.getAndIncrement());
+    }
+
+    @BeforeEach
+    void setUpUserId() {
+        userId = requireNonNull(
+                userProfileService.getOrCreateUserProfileBySocialProviderId("google", generateId())
+                                  .block())
+                .id();
+        userToken = tokenService.generateToken(userId);
     }
 }

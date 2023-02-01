@@ -1,5 +1,6 @@
 package in.solomk.dictionary.service.user;
 
+import in.solomk.dictionary.service.user.model.UserProfile;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -14,7 +15,7 @@ public class UserProfileService {
         return userProfileRepository.findByUserId(userId);
     }
 
-    public Mono<UserProfile> getUserProfileBySocialProviderId(String socialProvider, String subjectId) {
+    public Mono<UserProfile> getOrCreateUserProfileBySocialProviderId(String socialProvider, String subjectId) {
         String socialProviderId = "{" + socialProvider + "}" + subjectId;
         return userProfileRepository.findBySocialProviderIds(socialProviderId)
                                     .switchIfEmpty(userProfileRepository.createUser(socialProviderId));

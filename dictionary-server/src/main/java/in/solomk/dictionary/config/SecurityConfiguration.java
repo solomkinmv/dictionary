@@ -123,7 +123,7 @@ public class SecurityConfiguration {
             @Value("${security.redirect.web:}") String redirectWeb) {
 
         return (webFilterExchange, authentication) ->
-                userProfileService.getUserProfileBySocialProviderId("google", authentication.getName()) // currently support only google
+                userProfileService.getOrCreateUserProfileBySocialProviderId("google", authentication.getName()) // currently support only google
                         .map(userProfile -> tokenService.generateToken(userProfile.id()))
                         .doOnNext(token -> {
                             log.debug("Generated JWT: {}", token);
