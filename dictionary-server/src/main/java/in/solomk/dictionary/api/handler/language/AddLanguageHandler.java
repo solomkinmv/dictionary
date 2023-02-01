@@ -1,7 +1,6 @@
 package in.solomk.dictionary.api.handler.language;
 
 import in.solomk.dictionary.api.dto.WordResponse;
-import in.solomk.dictionary.api.dto.language.CreateLanguageRequest;
 import in.solomk.dictionary.api.dto.language.LearningLanguagesAggregatedResponse;
 import in.solomk.dictionary.api.mapper.LearningLanguagesWebApiMapper;
 import in.solomk.dictionary.service.user.language.UserLanguagesService;
@@ -36,14 +35,9 @@ public class AddLanguageHandler implements HandlerFunction<ServerResponse> {
     }
 
     private Mono<LearningLanguagesAggregatedResponse> addLanguage(ServerRequest request, String userId) {
-        return extractRequestBody(request)
-                .flatMap(createLanguageRequest -> userLanguagesService.createLearningLanguage(
-                        userId, createLanguageRequest.languageCode()))
+        var languageCode = request.pathVariable("languageCode");
+        return userLanguagesService.createLearningLanguage(userId, languageCode)
                 .map(mapper::toLearningLanguagesAggregatedResponse);
-    }
-
-    private Mono<CreateLanguageRequest> extractRequestBody(ServerRequest request) {
-        return request.bodyToMono(CreateLanguageRequest.class);
     }
 
 }
