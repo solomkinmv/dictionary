@@ -31,6 +31,24 @@ public class UserLanguagesService {
                 .map(this::enrichLearningLanguagesWithFullNames);
     }
 
+    public Mono<List<LearningLanguageWithName>> deleteLearningLanguage(String userId, String languageCode) {
+        return userProfileRepository.findByUserId(userId)
+                                    .flatMap(userProfile -> removeLanguage(languageCode, userProfile))
+                                    .flatMap(userProfileRepository::save)
+                .map(UserProfile::languages)
+                .map(this::enrichLearningLanguagesWithFullNames);
+    }
+
+    private Mono<UserProfile> removeLanguage(String languageCode, UserProfile userProfile) {
+        var learningLanguage = new LearningLanguage(languageCode);
+        if (!userProfile.languages().contains(learningLanguage)) {
+            return Mono.just(userProfile);
+        }
+        var updatedLearningLanguages = new ArrayList<>(userProfile.languages());
+        updatedLearningLanguages.remove(learningLanguage);
+        return Mono.just(userProfile.withLanguages(updatedLearningLanguages));
+    }
+
     private List<LearningLanguageWithName> enrichLearningLanguagesWithFullNames(List<LearningLanguage> learningLanguages) {
         return learningLanguages.stream()
                 .map(this::toLearningLanguageWithName)
@@ -45,11 +63,12 @@ public class UserLanguagesService {
     }
 
     private Mono<UserProfile> addLanguage(String newLearningLanguageCode, UserProfile userProfile) {
-        if (userProfile.languages().contains(newLearningLanguageCode)) {
+        var newLearningLanguage = new LearningLanguage(newLearningLanguageCode);
+        if (userProfile.languages().contains(newLearningLanguage)) {
             return Mono.error(new AlreadyExistingException("Language %s already exists", newLearningLanguageCode));
         }
         var updatedLearningLanguages = new ArrayList<>(userProfile.languages());
-        updatedLearningLanguages.add(new LearningLanguage(newLearningLanguageCode));
+        updatedLearningLanguages.add(newLearningLanguage);
         return Mono.just(userProfile.withLanguages(updatedLearningLanguages));
     }
 
