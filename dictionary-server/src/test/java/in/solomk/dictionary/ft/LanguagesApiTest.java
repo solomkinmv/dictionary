@@ -1,6 +1,5 @@
 package in.solomk.dictionary.ft;
 
-import in.solomk.dictionary.api.dto.language.CreateLanguageRequest;
 import in.solomk.dictionary.api.dto.language.LearningLanguageResponse;
 import in.solomk.dictionary.api.dto.language.LearningLanguagesAggregatedResponse;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,7 @@ public class LanguagesApiTest extends BaseFuncTest {
     void addsLanguageForUser() {
         LearningLanguagesAggregatedResponse expectedResponse = new LearningLanguagesAggregatedResponse(List.of(new LearningLanguageResponse("en", "English")));
 
-        var userLanguagesResponse = userLanguagesTestClient.addLanguage(userToken, new CreateLanguageRequest("en"))
+        var userLanguagesResponse = userLanguagesTestClient.addLanguage(userToken, "en")
                                                            .expectStatus().isOk()
                                                            .expectBody(LearningLanguagesAggregatedResponse.class)
                                                            .returnResult()

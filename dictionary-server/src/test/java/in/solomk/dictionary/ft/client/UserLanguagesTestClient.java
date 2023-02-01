@@ -1,6 +1,5 @@
 package in.solomk.dictionary.ft.client;
 
-import in.solomk.dictionary.api.dto.language.CreateLanguageRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -12,11 +11,10 @@ public class UserLanguagesTestClient {
 
     private final WebTestClient webTestClient;
 
-    public WebTestClient.ResponseSpec addLanguage(String token, CreateLanguageRequest request) {
+    public WebTestClient.ResponseSpec addLanguage(String token, String languageCode) {
         return webTestClient.post()
-                            .uri("/api/languages")
+                            .uri("/api/languages/{languageCode}", languageCode)
                             .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
-                            .bodyValue(request)
                             .exchange();
     }
 
