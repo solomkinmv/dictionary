@@ -12,7 +12,7 @@ public class UserLanguagesTestClient {
     private final WebTestClient webTestClient;
 
     public WebTestClient.ResponseSpec addLanguage(String token, String languageCode) {
-        return webTestClient.post()
+        return webTestClient.put()
                             .uri("/api/languages/{languageCode}", languageCode)
                             .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
                             .exchange();

@@ -27,7 +27,7 @@ public class RouteConfiguration {
         HandlerFunction<ServerResponse> indexPage = (req) -> ServerResponse.ok().bodyValue(new ClassPathResource("public/index.html"));
         return RouterFunctions.route()
                               .GET("/api/languages", getLanguagesHandler)
-                              .POST("/api/languages/{languageCode}", addLanguageHandler)
+                              .PUT("/api/languages/{languageCode}", addLanguageHandler)
                               .DELETE("/api/languages/{languageCode}", deleteLanguageHandler)
                               .GET("/api/words", getWordsHandler)
                               .POST("/api/words", addWordHandler)
