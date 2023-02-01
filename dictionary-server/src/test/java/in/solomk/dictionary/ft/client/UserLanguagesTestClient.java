@@ -18,6 +18,13 @@ public class UserLanguagesTestClient {
                             .exchange();
     }
 
+    public WebTestClient.ResponseSpec deleteLanguage(String token, String languageCode) {
+        return webTestClient.delete()
+                            .uri("/api/languages/{languageCode}", languageCode)
+                            .headers(httpHeaders -> httpHeaders.setBearerAuth(token))
+                            .exchange();
+    }
+
     public WebTestClient.ResponseSpec getLanguages(String token) {
         return webTestClient.get()
                             .uri("/api/languages")

@@ -4,6 +4,7 @@ import in.solomk.dictionary.api.handler.AddWordHandler;
 import in.solomk.dictionary.api.handler.GetWordsHandler;
 import in.solomk.dictionary.api.handler.ProfileHandler;
 import in.solomk.dictionary.api.handler.language.AddLanguageHandler;
+import in.solomk.dictionary.api.handler.language.DeleteLanguageHandler;
 import in.solomk.dictionary.api.handler.language.GetLanguagesHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,11 +22,13 @@ public class RouteConfiguration {
                                                   AddWordHandler addWordHandler,
                                                   ProfileHandler profileHandler,
                                                   GetLanguagesHandler getLanguagesHandler,
-                                                  AddLanguageHandler addLanguageHandler) {
+                                                  AddLanguageHandler addLanguageHandler,
+                                                  DeleteLanguageHandler deleteLanguageHandler) {
         HandlerFunction<ServerResponse> indexPage = (req) -> ServerResponse.ok().bodyValue(new ClassPathResource("public/index.html"));
         return RouterFunctions.route()
                               .GET("/api/languages", getLanguagesHandler)
                               .POST("/api/languages/{languageCode}", addLanguageHandler)
+                              .DELETE("/api/languages/{languageCode}", deleteLanguageHandler)
                               .GET("/api/words", getWordsHandler)
                               .POST("/api/words", addWordHandler)
                               .GET("/api/me", profileHandler)
@@ -33,22 +36,4 @@ public class RouteConfiguration {
                               .GET("/**", indexPage)
                               .build();
     }
-
-//    @Bean
-//    @Profile("mongo")
-//    CorsWebFilter corsFilter() {
-//        return new CorsWebFilter(exchange -> new CorsConfiguration().applyPermitDefaultValues());
-//    }
-//
-//    @Bean
-//    @Profile("!mongo")
-//    CorsWebFilter permissiveCorsFilter() {
-//        return new CorsWebFilter(exchange -> {
-//            CorsConfiguration config = new CorsConfiguration();
-//            config.addAllowedOrigin("*");
-//            config.addAllowedHeader("*");
-//            config.addAllowedMethod("*");
-//            return config;
-//        });
-//    }
 }

@@ -31,6 +31,21 @@ public class LanguagesApiTest extends BaseFuncTest {
         verifyUserLanguagesResponse(expectedResponse);
     }
 
+    @Test
+    void removesLanguageForUser() {
+        LearningLanguagesAggregatedResponse expectedResponse = new LearningLanguagesAggregatedResponse(emptyList());
+
+        userLanguagesTestClient.addLanguage(userToken, "en");
+        var userLanguagesResponse = userLanguagesTestClient.deleteLanguage(userToken, "en")
+                                                           .expectStatus()
+                                                           .isOk()
+                                                           .expectBody(LearningLanguagesAggregatedResponse.class)
+                                                           .returnResult()
+                                                           .getResponseBody();
+        assertThat(userLanguagesResponse).isEqualTo(expectedResponse);
+        verifyUserLanguagesResponse(expectedResponse);
+    }
+
     private void verifyUserLanguagesResponse(LearningLanguagesAggregatedResponse expectedValue) {
         userLanguagesTestClient.getLanguages(userToken)
                                .expectStatus()
