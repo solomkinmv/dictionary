@@ -1,12 +1,12 @@
 package in.solomk.dictionary.api;
 
-import in.solomk.dictionary.api.handler.AddWordHandler;
-import in.solomk.dictionary.api.handler.GetWordsHandler;
-import in.solomk.dictionary.api.handler.ProfileHandler;
 import in.solomk.dictionary.api.handler.language.AddLanguageHandler;
 import in.solomk.dictionary.api.handler.language.DeleteLanguageHandler;
 import in.solomk.dictionary.api.handler.language.GetLanguagesHandler;
+import in.solomk.dictionary.api.handler.profile.ProfileHandler;
 import in.solomk.dictionary.api.handler.settings.GetLanguageSettingsHandler;
+import in.solomk.dictionary.api.handler.words.AddWordHandler;
+import in.solomk.dictionary.api.handler.words.GetWordsHandler;
 import in.solomk.dictionary.exception.AlreadyExistingException;
 import in.solomk.dictionary.exception.BadRequestException;
 import in.solomk.dictionary.exception.DictionaryException;

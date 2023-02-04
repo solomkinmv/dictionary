@@ -2,7 +2,7 @@ package in.solomk.dictionary.api.mapper;
 
 import in.solomk.dictionary.api.dto.language.LearningLanguageResponse;
 import in.solomk.dictionary.api.dto.language.LearningLanguagesAggregatedResponse;
-import in.solomk.dictionary.service.user.model.LearningLanguageWithName;
+import in.solomk.dictionary.service.profile.model.LearningLanguageWithName;
 import org.mapstruct.Mapper;
 
 import java.util.List;

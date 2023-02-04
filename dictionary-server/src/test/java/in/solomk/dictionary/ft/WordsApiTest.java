@@ -1,15 +1,15 @@
 package in.solomk.dictionary.ft;
 
-import in.solomk.dictionary.api.dto.CreateWordRequest;
-import in.solomk.dictionary.api.dto.UserWordsResponse;
-import in.solomk.dictionary.api.dto.WordResponse;
-import in.solomk.dictionary.service.user.language.SupportedLanguage;
+import in.solomk.dictionary.api.dto.words.CreateWordRequest;
+import in.solomk.dictionary.api.dto.words.UserWordsResponse;
+import in.solomk.dictionary.api.dto.words.WordResponse;
+import in.solomk.dictionary.service.language.SupportedLanguage;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static in.solomk.dictionary.service.user.language.SupportedLanguage.ENGLISH;
-import static in.solomk.dictionary.service.user.language.SupportedLanguage.UKRAINIAN;
+import static in.solomk.dictionary.service.language.SupportedLanguage.ENGLISH;
+import static in.solomk.dictionary.service.language.SupportedLanguage.UKRAINIAN;
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 

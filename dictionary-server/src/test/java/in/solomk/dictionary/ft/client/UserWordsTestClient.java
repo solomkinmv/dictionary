@@ -1,6 +1,6 @@
 package in.solomk.dictionary.ft.client;
 
-import in.solomk.dictionary.api.dto.CreateWordRequest;
+import in.solomk.dictionary.api.dto.words.CreateWordRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.reactive.server.WebTestClient;
