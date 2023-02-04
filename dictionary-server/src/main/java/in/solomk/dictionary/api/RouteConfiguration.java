@@ -6,6 +6,7 @@ import in.solomk.dictionary.api.handler.ProfileHandler;
 import in.solomk.dictionary.api.handler.language.AddLanguageHandler;
 import in.solomk.dictionary.api.handler.language.DeleteLanguageHandler;
 import in.solomk.dictionary.api.handler.language.GetLanguagesHandler;
+import in.solomk.dictionary.api.handler.settings.GetLanguageSettingsHandler;
 import in.solomk.dictionary.exception.AlreadyExistingException;
 import in.solomk.dictionary.exception.BadRequestException;
 import in.solomk.dictionary.exception.DictionaryException;
@@ -44,9 +45,11 @@ public class RouteConfiguration {
                                                   ProfileHandler profileHandler,
                                                   GetLanguagesHandler getLanguagesHandler,
                                                   AddLanguageHandler addLanguageHandler,
-                                                  DeleteLanguageHandler deleteLanguageHandler) {
+                                                  DeleteLanguageHandler deleteLanguageHandler,
+                                                  GetLanguageSettingsHandler getLanguageSettingsHandler) {
         HandlerFunction<ServerResponse> indexPage = (req) -> ServerResponse.ok().bodyValue(new ClassPathResource("public/index.html"));
         return RouterFunctions.route()
+                              .GET("/api/settings/languages", getLanguageSettingsHandler)
                               .GET("/api/languages", getLanguagesHandler)
                               .PUT("/api/languages/{languageCode}", addLanguageHandler)
                               .DELETE("/api/languages/{languageCode}", deleteLanguageHandler)
