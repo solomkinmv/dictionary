@@ -1,4 +1,4 @@
-package in.solomk.dictionary.service.exception;
+package in.solomk.dictionary.exception;
 
 public abstract class DictionaryException extends RuntimeException {
 

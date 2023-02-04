@@ -12,24 +12,23 @@ import java.util.stream.Collectors;
 @Document(collection = "user_words")
 public record UserWordsDocument(
         @Id
-        String userId,
+        String documentId,
         Map<String, WordDocument> words
 ) {
 
-    public static UserWordsDocument valueOf(UserWords userWords) {
+    public static UserWordsDocument valueOf(String documentId, UserWords userWords) {
         return new UserWordsDocument(
-                userWords.userId(),
+                documentId,
                 userWords.words()
                          .values()
                          .stream()
-                         .map(WordDocument::valueOf)
-                         .collect(Collectors.toMap(WordDocument::id, Function.identity()))
+                        .map(WordDocument::valueOf)
+                        .collect(Collectors.toMap(WordDocument::id, Function.identity()))
         );
     }
 
     public UserWords toModel() {
         return new UserWords(
-                userId,
                 words.values()
                      .stream()
                      .map(WordDocument::toModel)

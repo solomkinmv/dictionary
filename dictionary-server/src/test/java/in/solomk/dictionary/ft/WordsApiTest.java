@@ -3,10 +3,13 @@ package in.solomk.dictionary.ft;
 import in.solomk.dictionary.api.dto.CreateWordRequest;
 import in.solomk.dictionary.api.dto.UserWordsResponse;
 import in.solomk.dictionary.api.dto.WordResponse;
+import in.solomk.dictionary.service.user.language.SupportedLanguage;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
+import static in.solomk.dictionary.service.user.language.SupportedLanguage.ENGLISH;
+import static in.solomk.dictionary.service.user.language.SupportedLanguage.UKRAINIAN;
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,12 +17,13 @@ public class WordsApiTest extends BaseFuncTest {
 
     @Test
     void returnsEmptyUserWords() {
-        verifyUserWordsResponse(new UserWordsResponse(userId, emptyMap()));
+        verifyUserWordsResponse(ENGLISH, new UserWordsResponse(emptyMap()));
     }
 
     @Test
     void addsWordForUser() {
-        WordResponse wordResponse = userWordsTestClient.addWord(userToken, new CreateWordRequest("word-1", "meaning-1"))
+        var request = new CreateWordRequest("word-1", "meaning-1");
+        WordResponse wordResponse = userWordsTestClient.addWord(userToken, ENGLISH.getLanguageCode(), request)
                                                        .expectStatus().isOk()
                                                        .expectBody(WordResponse.class)
                                                        .returnResult()
@@ -32,11 +36,49 @@ public class WordsApiTest extends BaseFuncTest {
                 .isEqualTo(new WordResponse(null, "word-1", "meaning-1"));
         assertThat(wordResponse.id()).isNotBlank();
 
-        verifyUserWordsResponse(new UserWordsResponse(userId, Map.of(wordResponse.id(), wordResponse)));
+        verifyUserWordsResponse(ENGLISH, new UserWordsResponse(Map.of(wordResponse.id(), wordResponse)));
     }
 
-    private void verifyUserWordsResponse(UserWordsResponse expectedValue) {
-        userWordsTestClient.getUserWords(userToken)
+    @Test
+    void returnsBadRequestIfLanguageIsNotSupported() {
+        var request = new CreateWordRequest("word-1", "meaning-1");
+        userWordsTestClient.addWord(userToken, "xxx", request)
+                           .expectStatus()
+                           .isBadRequest()
+                           .expectBody()
+                           .json("""
+                                         {
+                                           "path": "/api/languages/xxx/words",
+                                           "status": 400,
+                                           "error": "Bad Request",
+                                           "message": "Language code is not supported"
+                                         }""")
+                           .jsonPath("$.requestId").isNotEmpty();
+    }
+
+    @Test
+    void addsWordsFromDifferentLanguages() {
+        WordResponse wordResponse = userWordsTestClient.addWord(userToken, ENGLISH.getLanguageCode(),
+                                                                new CreateWordRequest("word-1", "meaning-1"))
+                                                       .expectStatus().isOk()
+                                                       .expectBody(WordResponse.class)
+                                                       .returnResult()
+                                                       .getResponseBody();
+
+        verifyUserWordsResponse(ENGLISH, new UserWordsResponse(Map.of(wordResponse.id(), wordResponse)));
+
+        WordResponse wordResponse2 = userWordsTestClient.addWord(userToken, UKRAINIAN.getLanguageCode(),
+                                                                 new CreateWordRequest("слава", "glory"))
+                                                        .expectStatus().isOk()
+                                                        .expectBody(WordResponse.class)
+                                                        .returnResult()
+                                                        .getResponseBody();
+
+        verifyUserWordsResponse(UKRAINIAN, new UserWordsResponse(Map.of(wordResponse2.id(), wordResponse2)));
+    }
+
+    private void verifyUserWordsResponse(SupportedLanguage language, UserWordsResponse expectedValue) {
+        userWordsTestClient.getUserWords(userToken, language.getLanguageCode())
                            .expectStatus()
                            .isOk()
                            .expectBody(UserWordsResponse.class)

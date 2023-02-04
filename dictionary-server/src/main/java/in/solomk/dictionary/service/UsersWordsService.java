@@ -3,6 +3,7 @@ package in.solomk.dictionary.service;
 import in.solomk.dictionary.service.model.UnsavedWord;
 import in.solomk.dictionary.service.model.UserWords;
 import in.solomk.dictionary.service.model.Word;
+import in.solomk.dictionary.service.user.language.SupportedLanguage;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -15,17 +16,17 @@ public class UsersWordsService {
 
     private final UserWordsRepository repository;
 
-    public Mono<UserWords> getUserWords(String userId) {
-        return repository.getUserWords(userId)
-                         .switchIfEmpty(Mono.just(UserWords.of(userId)));
+    public Mono<UserWords> getUserWords(String userId, SupportedLanguage language) {
+        return repository.getUserWords(userId, language)
+                         .switchIfEmpty(Mono.just(UserWords.EMPTY));
     }
 
-    public Mono<Word> saveWord(String userId, UnsavedWord unsavedWord) {
+    public Mono<Word> saveWord(String userId, SupportedLanguage language, UnsavedWord unsavedWord) {
         Word wordWithId = new Word(UUID.randomUUID().toString(), unsavedWord.wordText(), null, unsavedWord.translation());
-        return repository.getUserWords(userId)
-                         .switchIfEmpty(Mono.just(UserWords.of(userId)))
-                         .map(userWords -> userWords.addWord(wordWithId))
-                         .flatMap(repository::saveUserWords)
-                         .thenReturn(wordWithId);
+        return repository.getUserWords(userId, language)
+                         .switchIfEmpty(Mono.just(UserWords.EMPTY))
+                .map(userWords -> userWords.addWord(wordWithId))
+                .flatMap(userWords -> repository.saveUserWords(userId, language, userWords))
+                .thenReturn(wordWithId);
     }
 }
