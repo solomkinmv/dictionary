@@ -4,7 +4,7 @@ import in.solomk.dictionary.api.security.TokenService;
 import in.solomk.dictionary.ft.client.ActuatorTestClient;
 import in.solomk.dictionary.ft.client.UserLanguagesTestClient;
 import in.solomk.dictionary.ft.client.UserWordsTestClient;
-import in.solomk.dictionary.service.user.UserProfileService;
+import in.solomk.dictionary.service.profile.UserProfileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

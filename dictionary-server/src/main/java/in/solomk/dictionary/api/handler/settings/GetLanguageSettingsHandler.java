@@ -1,10 +1,10 @@
 package in.solomk.dictionary.api.handler.settings;
 
-import in.solomk.dictionary.api.dto.UserWordsResponse;
 import in.solomk.dictionary.api.dto.settings.LanguageSettingsResponse;
 import in.solomk.dictionary.api.dto.settings.SupportedLanguageResponse;
-import in.solomk.dictionary.service.user.language.SupportedLanguage;
-import in.solomk.dictionary.service.user.settings.LanguageSettingsService;
+import in.solomk.dictionary.api.dto.words.UserWordsResponse;
+import in.solomk.dictionary.service.language.SupportedLanguage;
+import in.solomk.dictionary.service.settings.LanguageSettingsService;
 import lombok.AllArgsConstructor;
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.http.MediaType;

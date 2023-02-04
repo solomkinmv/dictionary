@@ -1,11 +1,11 @@
 package in.solomk.dictionary.api.mapper;
 
-import in.solomk.dictionary.api.dto.CreateWordRequest;
-import in.solomk.dictionary.api.dto.UserWordsResponse;
-import in.solomk.dictionary.api.dto.WordResponse;
-import in.solomk.dictionary.service.model.UnsavedWord;
-import in.solomk.dictionary.service.model.UserWords;
-import in.solomk.dictionary.service.model.Word;
+import in.solomk.dictionary.api.dto.words.CreateWordRequest;
+import in.solomk.dictionary.api.dto.words.UserWordsResponse;
+import in.solomk.dictionary.api.dto.words.WordResponse;
+import in.solomk.dictionary.service.words.model.UnsavedWord;
+import in.solomk.dictionary.service.words.model.UserWords;
+import in.solomk.dictionary.service.words.model.Word;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

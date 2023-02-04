@@ -1,17 +1,17 @@
 package in.solomk.dictionary.security;
 
 import in.solomk.dictionary.api.RouteConfiguration;
-import in.solomk.dictionary.api.handler.AddWordHandler;
 import in.solomk.dictionary.api.handler.AuthHandler;
-import in.solomk.dictionary.api.handler.GetWordsHandler;
-import in.solomk.dictionary.api.handler.ProfileHandler;
 import in.solomk.dictionary.api.handler.language.AddLanguageHandler;
 import in.solomk.dictionary.api.handler.language.DeleteLanguageHandler;
 import in.solomk.dictionary.api.handler.language.GetLanguagesHandler;
+import in.solomk.dictionary.api.handler.profile.ProfileHandler;
 import in.solomk.dictionary.api.handler.settings.GetLanguageSettingsHandler;
+import in.solomk.dictionary.api.handler.words.AddWordHandler;
+import in.solomk.dictionary.api.handler.words.GetWordsHandler;
 import in.solomk.dictionary.api.security.TokenService;
 import in.solomk.dictionary.config.SecurityConfiguration;
-import in.solomk.dictionary.service.user.UserProfileService;
+import in.solomk.dictionary.service.profile.UserProfileService;
 import org.junit.jupiter.api.Test;
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.beans.factory.annotation.Autowired;

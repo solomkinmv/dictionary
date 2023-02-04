@@ -1,9 +1,9 @@
 package in.solomk.dictionary.api.handler.language;
 
-import in.solomk.dictionary.api.dto.WordResponse;
 import in.solomk.dictionary.api.dto.language.LearningLanguagesAggregatedResponse;
+import in.solomk.dictionary.api.dto.words.WordResponse;
 import in.solomk.dictionary.api.mapper.LearningLanguagesWebApiMapper;
-import in.solomk.dictionary.service.user.language.UserLanguagesService;
+import in.solomk.dictionary.service.language.UserLanguagesService;
 import lombok.AllArgsConstructor;
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.stereotype.Component;
