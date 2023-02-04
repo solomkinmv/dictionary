@@ -1,6 +1,6 @@
 package in.solomk.dictionary.service.user.language;
 
-import in.solomk.dictionary.service.exception.AlreadyExistingException;
+import in.solomk.dictionary.exception.AlreadyExistingException;
 import in.solomk.dictionary.service.user.UserProfileRepository;
 import in.solomk.dictionary.service.user.model.LearningLanguage;
 import in.solomk.dictionary.service.user.model.LearningLanguageWithName;

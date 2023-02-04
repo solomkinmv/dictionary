@@ -12,6 +12,7 @@ import java.util.Optional;
 public enum SupportedLanguage {
     ENGLISH("en", "English"),
     SPANISH("es", "Español"),
+    UKRAINIAN("uk", "Українська"),
     ;
 
     private final String languageCode;

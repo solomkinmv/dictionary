@@ -3,7 +3,9 @@ package in.solomk.dictionary.api.handler;
 import in.solomk.dictionary.api.dto.CreateWordRequest;
 import in.solomk.dictionary.api.dto.WordResponse;
 import in.solomk.dictionary.api.mapper.UserWordsWebApiMapper;
+import in.solomk.dictionary.exception.BadRequestException;
 import in.solomk.dictionary.service.UsersWordsService;
+import in.solomk.dictionary.service.user.language.SupportedLanguage;
 import lombok.AllArgsConstructor;
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.stereotype.Component;
@@ -36,12 +38,20 @@ public class AddWordHandler implements HandlerFunction<ServerResponse> {
 
     private Mono<WordResponse> addWord(ServerRequest request, String userId) {
         return extractRequestBody(request)
-                .flatMap(createWordRequest -> usersWordsService.saveWord(userId, mapper.toUnsavedWord(createWordRequest)))
+                .flatMap(createWordRequest -> usersWordsService.saveWord(userId,
+                                                                         extractLanguageCode(request),
+                                                                         mapper.toUnsavedWord(createWordRequest)))
                 .map(mapper::toWordResponse);
     }
 
     private Mono<CreateWordRequest> extractRequestBody(ServerRequest request) {
         return request.bodyToMono(CreateWordRequest.class);
+    }
+
+    private SupportedLanguage extractLanguageCode(ServerRequest request) {
+        var languageCode = request.pathVariable("languageCode");
+        return SupportedLanguage.getByLanguageCode(languageCode)
+                                .orElseThrow(() -> new BadRequestException("Language code is not supported", languageCode));
     }
 
 }

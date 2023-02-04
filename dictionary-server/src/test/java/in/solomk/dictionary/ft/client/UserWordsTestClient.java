@@ -30,17 +30,17 @@ public class UserWordsTestClient {
                             .exchange();
     }
 
-    public WebTestClient.ResponseSpec addWord(String token, CreateWordRequest request) {
+    public WebTestClient.ResponseSpec addWord(String token, String languageCode, CreateWordRequest request) {
         return webTestClient.post()
-                            .uri("/api/words")
+                            .uri("/api/languages/{languageCode}/words", languageCode)
                             .header("Authorization", "Bearer " + token)
                             .bodyValue(request)
                             .exchange();
     }
 
-    public WebTestClient.ResponseSpec getUserWords(String token) {
+    public WebTestClient.ResponseSpec getUserWords(String token, String languageCode) {
         return webTestClient.get()
-                            .uri("/api/words")
+                            .uri("/api/languages/{languageCode}/words", languageCode)
                             .header("Authorization", "Bearer " + token)
                             .exchange();
     }
