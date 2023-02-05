@@ -21,4 +21,10 @@ class LanguagesClient {
         return userLanguages;
     }
 
+    async addLanguage(languageCode: string): Promise<AggregatedUserLanguages> {
+        const token = getToken();
+        const userLanguages = await this.restClient.put(`${process.env.REACT_APP_DICTIONARY_SERVICE_API_HOST}/api/languages/${languageCode}`, token);
+        console.log('Received response on adding user language', userLanguages)
+        return userLanguages;
+    }
 }

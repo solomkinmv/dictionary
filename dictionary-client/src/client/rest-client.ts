@@ -56,12 +56,12 @@ export class RestClient {
         return data
     }
 
-    async put(url: string, body: any) {
+    async put(url: string, token?: string, body?: any) {
+        let headers = this.fillBearerHeader(token);
+        headers['Content-Type'] = 'application/json'
         const response = await fetch(url, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: headers,
             body: JSON.stringify(body)
         })
         const data = await response.json()
