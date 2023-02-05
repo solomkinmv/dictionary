@@ -27,4 +27,11 @@ class LanguagesClient {
         console.log('Received response on adding user language', userLanguages)
         return userLanguages;
     }
+
+    async removeLanguage(languageCode: string): Promise<AggregatedUserLanguages> {
+        const token = getToken();
+        const userLanguages = await this.restClient.delete(`${process.env.REACT_APP_DICTIONARY_SERVICE_API_HOST}/api/languages/${languageCode}`, token);
+        console.log('Received response on removing user language', userLanguages)
+        return userLanguages;
+    }
 }
