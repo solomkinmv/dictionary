@@ -69,10 +69,12 @@ export class RestClient {
         return data
     }
 
-    async delete(url: string) {
+    async delete(url: string, token?: string) {
+        let headers = this.fillBearerHeader(token);
         const response = await fetch(url, {
             method: 'DELETE',
             mode: 'cors',
+            headers: headers
         })
         if (response.status === 404) {
             throw new NotFoundError("Could not find resource at " + url)

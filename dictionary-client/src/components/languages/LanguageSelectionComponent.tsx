@@ -21,6 +21,17 @@ export function LanguageSelectionComponent() {
             .then(userLanguages => setUserLanguages(userLanguages.languages))
     }, [settingsClient, languagesClient]);
 
+    async function removeLanguage(userLanguage: UserLanguage) {
+        const aggregatedUserLanguages = await languagesClient.removeLanguage(userLanguage.languageCode)
+        setUserLanguages(aggregatedUserLanguages.languages)
+    }
+
+    async function addLanguage(selectedLanguage: SupportedLanguage) {
+        const aggregatedUserLanguages = await languagesClient.addLanguage(selectedLanguage.languageCode)
+        setUserLanguages(aggregatedUserLanguages.languages)
+        setLanguageSelectorHidden(true)
+    }
+
     return (
         <>
             <h2>Supported Languages:</h2>
@@ -33,7 +44,12 @@ export function LanguageSelectionComponent() {
             <h2>User Languages:</h2>
             <ul>
                 {userLanguages.map((userLanguage) => (
-                    <li key={userLanguage.languageCode}>{userLanguage.languageName}</li>
+                    <li key={userLanguage.languageCode}>
+                        <span>{userLanguage.languageName}</span>
+                        <button onClick={() => removeLanguage(userLanguage)}>
+                            x
+                        </button>
+                    </li>
                 ))}
             </ul>
             {userLanguages.length === 0 && <div>You don't have any languages configured</div>}
@@ -46,11 +62,7 @@ export function LanguageSelectionComponent() {
             {!languageSelectorHidden &&
                 <LanguageListComponent
                     languages={supportedLanguages}
-                    onSelected={async (selectedLanguage) => {
-                        const aggregatedUserLanguages = await languagesClient.addLanguage(selectedLanguage.languageCode)
-                        setUserLanguages(aggregatedUserLanguages.languages)
-                        setLanguageSelectorHidden(true)
-                    }}/>
+                    onSelected={(selectedLanguage) => addLanguage(selectedLanguage)}/>
             }
         </>
     )
