@@ -32,6 +32,7 @@ function App() {
             }}>
                 <Link to="/">Home</Link> | {" "}
                 <Link to="/words">Words</Link> | {" "}
+                <Link to="/languages">Languages</Link> | {" "}
                 <Link to="/profile">Profile</Link> | {" "}
                 <Link to="/about">About</Link> | {" "}
                 <Link to="/" onClick={() => auth.signout(() => navigate("/"))}>Logout</Link>
