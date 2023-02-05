@@ -6,7 +6,7 @@ interface LanguageListComponentProps {
     onSelected: (language: SupportedLanguage) => void;
 }
 
-export function LanguageListComponent(props: LanguageListComponentProps) {
+export function LanguageSelectorComponent(props: LanguageListComponentProps) {
     return (
         <div>
             <label htmlFor="language-select">Choose a language:</label>

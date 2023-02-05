@@ -11,7 +11,7 @@ import AuthorizationComponent from "./components/auth/login/AuthorizationCompone
 import ProfileComponent from "./components/profile/ProfileComponent";
 import RequireAuth from "./components/auth/require-auth";
 import {AuthProvider} from "./components/auth/authentication-helpers";
-import {LanguageSelectionComponent} from "./components/languages/LanguageSelectionComponent";
+import {UserLanguagesComponent} from "./components/languages/UserLanguagesComponent";
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
@@ -35,7 +35,7 @@ root.render(
                         }/>
                         <Route path="/languages" element={
                             <RequireAuth>
-                                <LanguageSelectionComponent/>
+                                <UserLanguagesComponent/>
                             </RequireAuth>
                         }/>
                         <Route

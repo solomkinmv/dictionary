@@ -3,9 +3,9 @@ import {useEffect, useState} from "react";
 import {SupportedLanguage} from "../../client/settings/supported-language";
 import {UserLanguage} from "../../client/languages/user-language";
 import {useLanguagesClient} from "../../client/languages/languages-client";
-import {LanguageListComponent} from "./LanguageListComponent";
+import {LanguageSelectorComponent} from "./LanguageSelectorComponent";
 
-export function LanguageSelectionComponent() {
+export function UserLanguagesComponent() {
     const settingsClient = useSettingsDictionaryClient();
     const languagesClient = useLanguagesClient();
 
@@ -60,7 +60,7 @@ export function LanguageSelectionComponent() {
                 Cancel adding new language
             </button>}
             {!languageSelectorHidden &&
-                <LanguageListComponent
+                <LanguageSelectorComponent
                     languages={supportedLanguages}
                     onSelected={(selectedLanguage) => addLanguage(selectedLanguage)}/>
             }
