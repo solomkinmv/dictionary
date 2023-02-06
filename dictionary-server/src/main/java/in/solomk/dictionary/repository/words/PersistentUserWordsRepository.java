@@ -28,6 +28,6 @@ public class PersistentUserWordsRepository implements UserWordsRepository {
     }
 
     private String generateDocumentId(String userId, SupportedLanguage language) {
-        return userId + "_" + language;
+        return userId + "_" + language.getLanguageCode();
     }
 }
