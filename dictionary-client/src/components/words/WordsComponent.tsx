@@ -1,19 +1,25 @@
 import {Word} from "../../client/model/word";
-import {dictionaryClient} from "../../client/dictionary-client";
-import {useEffect, useState} from "react";
+import {useDictionaryClient} from "../../client/dictionary-client";
+import {useContext, useEffect, useState} from "react";
 import AddWordComponent from "./AddWordComponent";
+import {CurrentLanguageContext} from "../../context/CurrentLanguageContext";
 
 function WordsComponent() {
 
     const [words, setWords] = useState<Word[]>([]);
+    const dictionaryClient = useDictionaryClient();
+    const currentLanguageContext = useContext(CurrentLanguageContext);
+    console.log("Current language on WordsComponent render", currentLanguageContext)
+    const currentLanguage = currentLanguageContext.currentLanguage;
 
     useEffect(() => {
-        dictionaryClient()
-            .getWords()
+        if (!currentLanguage) return;
+        dictionaryClient
+            .getWords(currentLanguage)
             .then(userWords => {
                 setWords(Array.from(Object.values(userWords.words)));
             });
-    }, [])
+    }, [currentLanguage, dictionaryClient])
 
     return (
         <div>
