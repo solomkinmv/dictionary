@@ -12,42 +12,45 @@ import ProfileComponent from "./components/profile/ProfileComponent";
 import RequireAuth from "./components/auth/require-auth";
 import {AuthProvider} from "./components/auth/authentication-helpers";
 import {UserLanguagesComponent} from "./components/languages/UserLanguagesComponent";
+import {CurrentLanguageProvider} from "./context/CurrentLanguageContext";
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
     <React.StrictMode>
         <BrowserRouter>
             <AuthProvider>
-                <Routes>
-                    <Route path="/" element={<App/>}>
-                        <Route path="/" element={<Home/>}/>
-                        <Route path="/login" element={<Login/>}/>
-                        <Route path="/authorized" element={<AuthorizationComponent/>}/>
-                        <Route path="/profile" element={
-                            <RequireAuth>
-                                <ProfileComponent/>
-                            </RequireAuth>
-                        }/>
-                        <Route path="/words" element={
-                            <RequireAuth>
-                                <WordsComponent/>
-                            </RequireAuth>
-                        }/>
-                        <Route path="/languages" element={
-                            <RequireAuth>
-                                <UserLanguagesComponent/>
-                            </RequireAuth>
-                        }/>
-                        <Route
-                            path="*"
-                            element={
-                                <main style={{padding: "1rem"}}>
-                                    <p>No such page exist</p>
-                                </main>
-                            }
-                        />
-                    </Route>
-                </Routes>
+                <CurrentLanguageProvider>
+                    <Routes>
+                        <Route path="/" element={<App/>}>
+                            <Route path="/" element={<Home/>}/>
+                            <Route path="/login" element={<Login/>}/>
+                            <Route path="/authorized" element={<AuthorizationComponent/>}/>
+                            <Route path="/profile" element={
+                                <RequireAuth>
+                                    <ProfileComponent/>
+                                </RequireAuth>
+                            }/>
+                            <Route path="/words" element={
+                                <RequireAuth>
+                                    <WordsComponent/>
+                                </RequireAuth>
+                            }/>
+                            <Route path="/languages" element={
+                                <RequireAuth>
+                                    <UserLanguagesComponent/>
+                                </RequireAuth>
+                            }/>
+                            <Route
+                                path="*"
+                                element={
+                                    <main style={{padding: "1rem"}}>
+                                        <p>No such page exist</p>
+                                    </main>
+                                }
+                            />
+                        </Route>
+                    </Routes>
+                </CurrentLanguageProvider>
             </AuthProvider>
         </BrowserRouter>
     </React.StrictMode>

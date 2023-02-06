@@ -1,8 +1,8 @@
-import {useContext, useState} from "react";
+import {useState} from "react";
 import {useDictionaryClient} from "../../client/dictionary-client";
 import {UnsavedWord} from "../../client/model/unsaved-word";
 import {Word} from "../../client/model/word";
-import {CurrentLanguageContext} from "../../context/CurrentLanguageContext";
+import useCurrentLanguage from "../../context/CurrentLanguageContext";
 
 interface AddWordComponentProps {
     onWordAdded: (word: Word) => void
@@ -11,7 +11,7 @@ interface AddWordComponentProps {
 function AddWordComponent(props: AddWordComponentProps) {
     const [wordText, setWordText] = useState("");
     const [translation, setTranslation] = useState("");
-    const currentLanguageContext = useContext(CurrentLanguageContext);
+    const currentLanguageContext = useCurrentLanguage();
 
     const client = useDictionaryClient();
 
