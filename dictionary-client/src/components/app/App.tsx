@@ -5,6 +5,7 @@ import {CurrentLanguageSelectionComponent} from "../languages/CurrentLanguageSel
 import {useLanguagesClient} from "../../client/languages/languages-client";
 import {useEffect, useState} from "react";
 import {UserLanguage} from "../../client/languages/user-language";
+import {CurrentLanguageContext} from "../../context/CurrentLanguageContext";
 
 function App() {
     const auth = useAuth();
@@ -58,11 +59,13 @@ function App() {
                     <CurrentLanguageSelectionComponent
                         currentLanguage={currentLanguage}
                         allUserLanguages={allUserLanguages}
-                        onSelected={selectedLanguage => console.log("Selected new language", selectedLanguage)}
+                        onSelected={selectedLanguage => setCurrentLanguage(selectedLanguage)}
                     />
                 }
             </nav>
-            <Outlet/>
+            <CurrentLanguageContext.Provider value={{currentLanguage: currentLanguage}}>
+                <Outlet/>
+            </CurrentLanguageContext.Provider>
         </div>
     );
 }

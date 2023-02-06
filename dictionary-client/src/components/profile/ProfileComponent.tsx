@@ -1,7 +1,7 @@
-import {dictionaryClient} from "../../client/dictionary-client";
+import {useDictionaryClient} from "../../client/dictionary-client";
 
 function ProfileComponent() {
-    const client = dictionaryClient();
+    const client = useDictionaryClient();
 
     return (
         <>
