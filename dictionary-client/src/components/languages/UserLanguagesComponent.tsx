@@ -4,31 +4,29 @@ import {SupportedLanguage} from "../../client/settings/supported-language";
 import {UserLanguage} from "../../client/languages/user-language";
 import {useLanguagesClient} from "../../client/languages/languages-client";
 import {LanguageSelectorComponent} from "./LanguageSelectorComponent";
+import useCurrentLanguage from "../../context/CurrentLanguageContext";
 
 export function UserLanguagesComponent() {
     const settingsClient = useSettingsDictionaryClient();
     const languagesClient = useLanguagesClient();
+    const currentLanguageContext = useCurrentLanguage();
 
     const [supportedLanguages, setSupportedLanguages] = useState<SupportedLanguage[]>([])
-    const [userLanguages, setUserLanguages] = useState<UserLanguage[]>([])
     const [languageSelectorHidden, setLanguageSelectorHidden] = useState(true)
 
     useEffect(() => {
         settingsClient.getSupportedLanguages()
             .then(supportedLanguages => setSupportedLanguages(supportedLanguages.supportedLanguages))
-
-        languagesClient.getLanguages()
-            .then(userLanguages => setUserLanguages(userLanguages.languages))
-    }, [settingsClient, languagesClient]);
+    }, [settingsClient]);
 
     async function removeLanguage(userLanguage: UserLanguage) {
         const aggregatedUserLanguages = await languagesClient.removeLanguage(userLanguage.languageCode)
-        setUserLanguages(aggregatedUserLanguages.languages)
+        currentLanguageContext.updateAllUserLanguages(aggregatedUserLanguages.languages)
     }
 
     async function addLanguage(selectedLanguage: SupportedLanguage) {
         const aggregatedUserLanguages = await languagesClient.addLanguage(selectedLanguage.languageCode)
-        setUserLanguages(aggregatedUserLanguages.languages)
+        currentLanguageContext.updateAllUserLanguages(aggregatedUserLanguages.languages)
         setLanguageSelectorHidden(true)
     }
 
@@ -43,7 +41,7 @@ export function UserLanguagesComponent() {
 
             <h2>User Languages:</h2>
             <ul>
-                {userLanguages.map((userLanguage) => (
+                {currentLanguageContext.allUserLanguages.map((userLanguage) => (
                     <li key={userLanguage.languageCode}>
                         <span>{userLanguage.languageName}</span>
                         <button onClick={() => removeLanguage(userLanguage)}>
@@ -52,7 +50,7 @@ export function UserLanguagesComponent() {
                     </li>
                 ))}
             </ul>
-            {userLanguages.length === 0 && <div>You don't have any languages configured</div>}
+            {currentLanguageContext.allUserLanguages.length === 0 && <div>You don't have any languages configured</div>}
             {languageSelectorHidden && <button onClick={() => setLanguageSelectorHidden(!languageSelectorHidden)}>
                 Add Language
             </button>}
