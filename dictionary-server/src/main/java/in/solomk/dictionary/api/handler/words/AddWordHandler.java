@@ -5,6 +5,7 @@ import in.solomk.dictionary.api.dto.words.WordResponse;
 import in.solomk.dictionary.api.mapper.UserWordsWebApiMapper;
 import in.solomk.dictionary.exception.BadRequestException;
 import in.solomk.dictionary.service.language.SupportedLanguage;
+import in.solomk.dictionary.service.language.UserLanguagesService;
 import in.solomk.dictionary.service.words.UsersWordsService;
 import lombok.AllArgsConstructor;
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
@@ -23,6 +24,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 public class AddWordHandler implements HandlerFunction<ServerResponse> {
 
     private final UsersWordsService usersWordsService;
+    private final UserLanguagesService userLanguagesService;
     private final UserWordsWebApiMapper mapper;
 
     @Override
@@ -32,8 +34,14 @@ public class AddWordHandler implements HandlerFunction<ServerResponse> {
                 .map(Principal::getName)
                 .flatMap(userId -> ServerResponse.ok()
                                                  .contentType(APPLICATION_JSON)
-                                                 .body(addWord(request, userId),
+                                                 .body(addAndValidateStudiedLanguage(request, userId),
                                                        WordResponse.class));
+    }
+
+    private Mono<WordResponse> addAndValidateStudiedLanguage(ServerRequest request, String userId) {
+        var supportedLanguage = extractLanguageCode(request);
+        return userLanguagesService.validateLanguageIsStudied(userId, supportedLanguage)
+                                   .then(addWord(request, userId));
     }
 
     private Mono<WordResponse> addWord(ServerRequest request, String userId) {

@@ -22,6 +22,7 @@ public class WordsApiTest extends BaseFuncTest {
 
     @Test
     void addsWordForUser() {
+        userLanguagesTestClient.addLanguage(userToken, ENGLISH.getLanguageCode());
         var request = new CreateWordRequest("word-1", "meaning-1");
         WordResponse wordResponse = userWordsTestClient.addWord(userToken, ENGLISH.getLanguageCode(), request)
                                                        .expectStatus().isOk()
@@ -58,15 +59,16 @@ public class WordsApiTest extends BaseFuncTest {
 
     @Test
     void addsWordsFromDifferentLanguages() {
+        userLanguagesTestClient.addLanguage(userToken, ENGLISH.getLanguageCode());
         WordResponse wordResponse = userWordsTestClient.addWord(userToken, ENGLISH.getLanguageCode(),
                                                                 new CreateWordRequest("word-1", "meaning-1"))
                                                        .expectStatus().isOk()
                                                        .expectBody(WordResponse.class)
                                                        .returnResult()
                                                        .getResponseBody();
-
         verifyUserWordsResponse(ENGLISH, new UserWordsResponse(Map.of(wordResponse.id(), wordResponse)));
 
+        userLanguagesTestClient.addLanguage(userToken, UKRAINIAN.getLanguageCode());
         WordResponse wordResponse2 = userWordsTestClient.addWord(userToken, UKRAINIAN.getLanguageCode(),
                                                                  new CreateWordRequest("слава", "glory"))
                                                         .expectStatus().isOk()
@@ -75,6 +77,23 @@ public class WordsApiTest extends BaseFuncTest {
                                                         .getResponseBody();
 
         verifyUserWordsResponse(UKRAINIAN, new UserWordsResponse(Map.of(wordResponse2.id(), wordResponse2)));
+    }
+
+    @Test
+    void returnsBadRequestIfAddingWordForNotStudiedLanguage() {
+        userWordsTestClient.addWord(userToken, UKRAINIAN.getLanguageCode(),
+                                    new CreateWordRequest("слава", "glory"))
+                           .expectStatus()
+                           .isBadRequest()
+                           .expectBody()
+                           .json("""
+                                         {
+                                           "path": "/api/languages/uk/words",
+                                           "status": 400,
+                                           "error": "Bad Request",
+                                           "message": "Language is not studied. Language code: uk"
+                                         }""")
+                           .jsonPath("$.requestId").isNotEmpty();
     }
 
     private void verifyUserWordsResponse(SupportedLanguage language, UserWordsResponse expectedValue) {
