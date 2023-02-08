@@ -40,7 +40,7 @@ public class DeleteLanguageHandler implements HandlerFunction<ServerResponse> {
 
     private Mono<LearningLanguagesAggregatedResponse> deleteLanguageAndWords(ServerRequest request, String userId) {
         var supportedLanguage = getSafeLanguage(request.pathVariable("languageCode"));
-        return usersWordsService.deleteUserWords(userId, supportedLanguage)
+        return usersWordsService.deleteAllUserWords(userId, supportedLanguage)
                                 .then(userLanguagesService.deleteLearningLanguage(userId, supportedLanguage))
                 .map(mapper::toLearningLanguagesAggregatedResponse);
     }

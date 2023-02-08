@@ -32,10 +32,19 @@ class DictionaryClient {
 
     async getWords(userLanguage: UserLanguage): Promise<UserWords> {
         const token = getToken();
-        const url = `${this._dictionaryHost}/api/languages/${userLanguage.languageCode}/words`;
+        const url = `${this._dictionaryHost}/api/languages/${userLanguage.languageCode}/words`
         console.debug('Getting user words', url)
         const userWords = await this.restClient.get(url, token)
         console.log('Received response on user words', userWords)
+        return userWords
+    }
+
+    async deleteWord(userLanguage: UserLanguage, word: Word): Promise<UserWords> {
+        const token = this.extractJwtToken();
+        const url = `${this._dictionaryHost}/api/languages/${userLanguage.languageCode}/words/${word.id}`
+        console.debug('Deleting word', url)
+        const userWords = await this.restClient.delete(url, token)
+        console.log('Received response on deleting the word', userWords)
         return userWords
     }
 

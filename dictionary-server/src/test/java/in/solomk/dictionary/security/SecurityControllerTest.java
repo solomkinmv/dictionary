@@ -8,6 +8,7 @@ import in.solomk.dictionary.api.handler.language.GetLanguagesHandler;
 import in.solomk.dictionary.api.handler.profile.ProfileHandler;
 import in.solomk.dictionary.api.handler.settings.GetLanguageSettingsHandler;
 import in.solomk.dictionary.api.handler.words.AddWordHandler;
+import in.solomk.dictionary.api.handler.words.DeleteWordHandler;
 import in.solomk.dictionary.api.handler.words.GetWordsHandler;
 import in.solomk.dictionary.api.security.TokenService;
 import in.solomk.dictionary.config.SecurityConfiguration;
@@ -35,7 +36,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
         @MockBean(GetLanguagesHandler.class),
         @MockBean(AddLanguageHandler.class),
         @MockBean(DeleteLanguageHandler.class),
-        @MockBean(GetLanguageSettingsHandler.class)
+        @MockBean(GetLanguageSettingsHandler.class),
+        @MockBean(DeleteWordHandler.class)
 })
 @ActiveProfiles("test")
 @RegisterReflectionForBinding(value = GetWordsHandler.class)

@@ -96,6 +96,32 @@ public class WordsApiTest extends BaseFuncTest {
                            .jsonPath("$.requestId").isNotEmpty();
     }
 
+    @Test
+    void deletesWordById() {
+        userLanguagesTestClient.addLanguage(userToken, ENGLISH.getLanguageCode());
+        WordResponse wordResponse1 = userWordsTestClient.addWord(userToken, ENGLISH.getLanguageCode(),
+                                                                 new CreateWordRequest("word-1", "meaning-1"))
+                                                        .expectBody(WordResponse.class)
+                                                        .returnResult()
+                                                        .getResponseBody();
+        WordResponse wordResponse2 = userWordsTestClient.addWord(userToken, ENGLISH.getLanguageCode(),
+                                                                 new CreateWordRequest("word-2", "meaning-2"))
+                                                        .expectBody(WordResponse.class)
+                                                        .returnResult()
+                                                        .getResponseBody();
+        verifyUserWordsResponse(ENGLISH, new UserWordsResponse(Map.of(wordResponse1.id(), wordResponse1, wordResponse2.id(), wordResponse2)));
+
+        userWordsTestClient.deleteWord(userToken, ENGLISH.getLanguageCode(), wordResponse1.id())
+                           .expectStatus()
+                           .isOk();
+        verifyUserWordsResponse(ENGLISH, new UserWordsResponse(Map.of(wordResponse2.id(), wordResponse2)));
+
+        userWordsTestClient.deleteWord(userToken, ENGLISH.getLanguageCode(), wordResponse2.id())
+                           .expectStatus()
+                           .isOk();
+        verifyUserWordsResponse(ENGLISH, new UserWordsResponse(emptyMap()));
+    }
+
     private void verifyUserWordsResponse(SupportedLanguage language, UserWordsResponse expectedValue) {
         userWordsTestClient.getUserWords(userToken, language.getLanguageCode())
                            .expectStatus()

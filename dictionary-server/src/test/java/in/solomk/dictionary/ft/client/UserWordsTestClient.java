@@ -33,7 +33,7 @@ public class UserWordsTestClient {
     public WebTestClient.ResponseSpec addWord(String token, String languageCode, CreateWordRequest request) {
         return webTestClient.post()
                             .uri("/api/languages/{languageCode}/words", languageCode)
-                            .header("Authorization", "Bearer " + token)
+                            .headers(headers -> headers.setBearerAuth(token))
                             .bodyValue(request)
                             .exchange();
     }
@@ -41,7 +41,14 @@ public class UserWordsTestClient {
     public WebTestClient.ResponseSpec getUserWords(String token, String languageCode) {
         return webTestClient.get()
                             .uri("/api/languages/{languageCode}/words", languageCode)
-                            .header("Authorization", "Bearer " + token)
+                            .headers(headers -> headers.setBearerAuth(token))
+                            .exchange();
+    }
+
+    public WebTestClient.ResponseSpec deleteWord(String token, String languageCode, String wordId) {
+        return webTestClient.delete()
+                            .uri("/api/languages/{languageCode}/words/{wordId}", languageCode, wordId)
+                            .headers(headers -> headers.setBearerAuth(token))
                             .exchange();
     }
 }

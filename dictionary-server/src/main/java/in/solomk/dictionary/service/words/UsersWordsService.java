@@ -21,7 +21,14 @@ public class UsersWordsService {
                          .switchIfEmpty(Mono.just(UserWords.EMPTY));
     }
 
-    public Mono<Void> deleteUserWords(String userId, SupportedLanguage language) {
+    public Mono<UserWords> deleteUserWord(String userId, SupportedLanguage language, String wordId) {
+        return repository.getUserWords(userId, language)
+                         .switchIfEmpty(Mono.just(UserWords.EMPTY))
+                .map(userWords -> userWords.deleteWord(wordId))
+                .flatMap(userWords -> repository.saveUserWords(userId, language, userWords));
+    }
+
+    public Mono<Void> deleteAllUserWords(String userId, SupportedLanguage language) {
         return repository.deleteUserWords(userId, language);
     }
 

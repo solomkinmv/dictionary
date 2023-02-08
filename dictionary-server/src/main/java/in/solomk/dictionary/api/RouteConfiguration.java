@@ -6,6 +6,7 @@ import in.solomk.dictionary.api.handler.language.GetLanguagesHandler;
 import in.solomk.dictionary.api.handler.profile.ProfileHandler;
 import in.solomk.dictionary.api.handler.settings.GetLanguageSettingsHandler;
 import in.solomk.dictionary.api.handler.words.AddWordHandler;
+import in.solomk.dictionary.api.handler.words.DeleteWordHandler;
 import in.solomk.dictionary.api.handler.words.GetWordsHandler;
 import in.solomk.dictionary.exception.AlreadyExistingException;
 import in.solomk.dictionary.exception.BadRequestException;
@@ -42,6 +43,7 @@ public class RouteConfiguration {
     @Bean
     RouterFunction<ServerResponse> routerFunction(GetWordsHandler getWordsHandler,
                                                   AddWordHandler addWordHandler,
+                                                  DeleteWordHandler deleteWordHandler,
                                                   ProfileHandler profileHandler,
                                                   GetLanguagesHandler getLanguagesHandler,
                                                   AddLanguageHandler addLanguageHandler,
@@ -55,6 +57,7 @@ public class RouteConfiguration {
                               .DELETE("/api/languages/{languageCode}", deleteLanguageHandler)
                               .GET("/api/languages/{languageCode}/words", getWordsHandler)
                               .POST("/api/languages/{languageCode}/words", addWordHandler)
+                              .DELETE("/api/languages/{languageCode}/words/{wordId}", deleteWordHandler)
                               .GET("/api/me", profileHandler)
                               .resources("/**", new ClassPathResource("/public/"))
                               .GET("/**", indexPage)

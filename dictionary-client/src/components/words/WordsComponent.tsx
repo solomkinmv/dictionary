@@ -29,12 +29,22 @@ function WordsComponent() {
         )
     }
 
+    async function removeWord(word: Word) {
+        const userWords = await dictionaryClient.deleteWord(currentLanguage!, word)
+        setWords(Array.from(Object.values(userWords.words)));
+    }
+
     return (
         <div>
             <AddWordComponent onWordAdded={word => setWords([...words, word])}/>
             <h1>Words</h1>
             {words.map((word) => (
-                <li key={word.id}>{word.wordText} - {word.translation}</li>
+                <li key={word.id}>
+                    <span>{word.wordText} - {word.translation}</span>
+                    <button onClick={() => removeWord(word)}>
+                        x
+                    </button>
+                </li>
             ))}
         </div>
     );
