@@ -3,7 +3,10 @@ package in.solomk.dictionary.api.handler.language;
 import in.solomk.dictionary.api.dto.language.LearningLanguagesAggregatedResponse;
 import in.solomk.dictionary.api.dto.words.WordResponse;
 import in.solomk.dictionary.api.mapper.LearningLanguagesWebApiMapper;
+import in.solomk.dictionary.exception.BadRequestException;
+import in.solomk.dictionary.service.language.SupportedLanguage;
 import in.solomk.dictionary.service.language.UserLanguagesService;
+import in.solomk.dictionary.service.words.UsersWordsService;
 import lombok.AllArgsConstructor;
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.stereotype.Component;
@@ -21,6 +24,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 public class DeleteLanguageHandler implements HandlerFunction<ServerResponse> {
 
     private final UserLanguagesService userLanguagesService;
+    private final UsersWordsService usersWordsService;
     private final LearningLanguagesWebApiMapper mapper;
 
     @Override
@@ -30,14 +34,21 @@ public class DeleteLanguageHandler implements HandlerFunction<ServerResponse> {
                 .map(Principal::getName)
                 .flatMap(userId -> ServerResponse.ok()
                                                  .contentType(APPLICATION_JSON)
-                                                 .body(deleteLanguage(request, userId),
+                                                 .body(deleteLanguageAndWords(request, userId),
                                                        LearningLanguagesAggregatedResponse.class));
     }
 
-    private Mono<LearningLanguagesAggregatedResponse> deleteLanguage(ServerRequest request, String userId) {
-        var languageCode = request.pathVariable("languageCode");
-        return userLanguagesService.deleteLearningLanguage(userId, languageCode)
+    private Mono<LearningLanguagesAggregatedResponse> deleteLanguageAndWords(ServerRequest request, String userId) {
+        var supportedLanguage = getSafeLanguage(request.pathVariable("languageCode"));
+        return usersWordsService.deleteUserWords(userId, supportedLanguage)
+                                .then(userLanguagesService.deleteLearningLanguage(userId, supportedLanguage))
                 .map(mapper::toLearningLanguagesAggregatedResponse);
+    }
+
+
+    private SupportedLanguage getSafeLanguage(String languageCode) {
+        return SupportedLanguage.getByLanguageCode(languageCode)
+                                .orElseThrow(() -> new BadRequestException("Language code is not supported %s", languageCode));
     }
 
 }

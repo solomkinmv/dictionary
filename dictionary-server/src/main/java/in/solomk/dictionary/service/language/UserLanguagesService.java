@@ -1,6 +1,7 @@
 package in.solomk.dictionary.service.language;
 
 import in.solomk.dictionary.exception.AlreadyExistingException;
+import in.solomk.dictionary.exception.BadRequestException;
 import in.solomk.dictionary.service.profile.UserProfileRepository;
 import in.solomk.dictionary.service.profile.model.LearningLanguage;
 import in.solomk.dictionary.service.profile.model.LearningLanguageWithName;
@@ -31,16 +32,26 @@ public class UserLanguagesService {
                 .map(this::enrichLearningLanguagesWithFullNames);
     }
 
-    public Mono<List<LearningLanguageWithName>> deleteLearningLanguage(String userId, String languageCode) {
+    public Mono<List<LearningLanguageWithName>> deleteLearningLanguage(String userId, SupportedLanguage supportedLanguage) {
         return userProfileRepository.findByUserId(userId)
-                                    .flatMap(userProfile -> removeLanguage(languageCode, userProfile))
+                                    .flatMap(userProfile -> removeLanguage(supportedLanguage, userProfile))
                                     .flatMap(userProfileRepository::save)
                 .map(UserProfile::languages)
                 .map(this::enrichLearningLanguagesWithFullNames);
     }
 
-    private Mono<UserProfile> removeLanguage(String languageCode, UserProfile userProfile) {
-        var learningLanguage = new LearningLanguage(languageCode);
+    public Mono<Void> validateLanguageIsStudied(String userId, SupportedLanguage language) {
+        return getLearningLanguagesByUserId(userId)
+                .filter(languages ->
+                                languages.stream()
+                                         .anyMatch(learningLanguage -> languageCodesMatch(language, learningLanguage)))
+                .switchIfEmpty(Mono.error(new BadRequestException("Language is not studied. Language code: %s",
+                                                                  language.getLanguageCode())))
+                .then();
+    }
+
+    private Mono<UserProfile> removeLanguage(SupportedLanguage supportedLanguage, UserProfile userProfile) {
+        var learningLanguage = new LearningLanguage(supportedLanguage.getLanguageCode());
         if (!userProfile.languages().contains(learningLanguage)) {
             return Mono.just(userProfile);
         }
@@ -70,6 +81,10 @@ public class UserLanguagesService {
         var updatedLearningLanguages = new ArrayList<>(userProfile.languages());
         updatedLearningLanguages.add(newLearningLanguage);
         return Mono.just(userProfile.withLanguages(updatedLearningLanguages));
+    }
+
+    private boolean languageCodesMatch(SupportedLanguage language, LearningLanguageWithName learningLanguage) {
+        return learningLanguage.languageCode().equals(language.getLanguageCode());
     }
 
 }

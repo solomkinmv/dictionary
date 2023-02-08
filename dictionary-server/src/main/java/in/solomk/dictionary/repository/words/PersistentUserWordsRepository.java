@@ -15,6 +15,11 @@ public class PersistentUserWordsRepository implements UserWordsRepository {
     private final ReactiveMongoUserWordsRepository repository;
 
     @Override
+    public Mono<Void> deleteUserWords(String userId, SupportedLanguage language) {
+        return repository.deleteById(generateDocumentId(userId, language));
+    }
+
+    @Override
     public Mono<UserWords> saveUserWords(String userId, SupportedLanguage language, UserWords userWords) {
         var documentId = generateDocumentId(userId, language);
         return repository.save(UserWordsDocument.valueOf(documentId, userWords))
