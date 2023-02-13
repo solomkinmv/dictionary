@@ -14,13 +14,13 @@
 
  docker run --rm \
   -e FACEBOOK_OAUTH2_CLIENT_ID={value} \
-  -e FACEBOOK_OAUTH2_CLIENT_SECRET=={value} \
-  -e GOOGLE_OAUTH2_CLIENT_ID=={value} \
-  -e GOOGLE_OAUTH2_CLIENT_SECRET=={value} \
-  -e OKTA_OAUTH2_CLIENT_ID=={value} \
-  -e OKTA_OAUTH2_CLIENT_SECRET=={value} \
-  -e OKTA_OAUTH2_DOMAIN=={value} \
-  -e RSA_PRIVATEKEYCONTENT=={value} \
+  -e FACEBOOK_OAUTH2_CLIENT_SECRET={value} \
+  -e GOOGLE_OAUTH2_CLIENT_ID={value} \
+  -e GOOGLE_OAUTH2_CLIENT_SECRET={value} \
+  -e OKTA_OAUTH2_CLIENT_ID={value} \
+  -e OKTA_OAUTH2_CLIENT_SECRET={value} \
+  -e OKTA_OAUTH2_DOMAIN={value} \
+  -e RSA_PRIVATEKEYCONTENT={value} \
   -e RSA_PUBLICKEYCONTENT={value} \
   -e SPRING_DATA_MONGODB_URI={value} \
   -e SECURITY_USER_NAME={value} \
